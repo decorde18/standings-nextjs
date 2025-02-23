@@ -1,0 +1,7 @@
+/* styles/AnimatedTitle.module.css */
+.title {
+  font-size: 2.5rem;
+  margin-top: 10px;
+  color: var(--primary);
+  text-align: center;
+}
