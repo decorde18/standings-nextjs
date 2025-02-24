@@ -22,5 +22,3 @@ module.exports = {
   //   'typescriptreact',
   // ],
 };
-//  "react/prop-types": [1], I added this line to keep from getting error on prop types
-// "no-unused-vars": "warn", I added this line to keep from getting error unused vars
