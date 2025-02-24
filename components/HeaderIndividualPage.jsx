@@ -7,7 +7,7 @@ import AnimatedTitle from '@/components/ui/AnimatedTitle';
 
 function HeaderIndividualPage(href) {
   const path = usePathname();
-  const pageTitle = routes.find((route) => route.href === path).title;
+  const pageTitle = routes.find((route) => route.href === path)?.title;
   const pageDescription = routes.find(
     (route) => route.href === path
   ).description;
