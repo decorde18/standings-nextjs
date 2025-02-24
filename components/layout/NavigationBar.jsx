@@ -35,7 +35,7 @@ export default function NavigationBar() {
         <ul>
           {routes.map((page) => (
             <li key={page.href} className={styles.navItem}>
-              <NavLink href={page.href}>{page?.title}</NavLink>
+              <NavLink href={page.href}>{page.title}</NavLink>
             </li>
           ))}
         </ul>

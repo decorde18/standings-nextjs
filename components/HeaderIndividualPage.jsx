@@ -2,8 +2,8 @@
 
 import { usePathname } from 'next/navigation';
 
-import { routes } from '@/lib/routes';
 import AnimatedTitle from '@/components/ui/AnimatedTitle';
+import { routes } from '@/lib/ro  utes';
 
 function HeaderIndividualPage(href) {
   const path = usePathname();
