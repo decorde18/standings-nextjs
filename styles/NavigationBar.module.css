@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 15px 20px;
-  background: linear-gradient(135deg, var(--nav-bg), #1a2a3a);
+  background: linear-gradient(135deg, var(--nav-bg), var(--color-accent));
   width: 100%;
   position: fixed;
   top: 0;
@@ -36,7 +36,7 @@
 }
 
 .navItem {
-  color: #ffffff;
+  color: #b7c2cf;
   font-size: 1.1rem;
   font-weight: 500;
   transition: color 0.3s ease-in-out;
@@ -51,7 +51,7 @@
   background: none;
   border: none;
   font-size: 1.5rem;
-  color: #fff;
+  color: #b7c2cf;
   cursor: pointer;
   display: none;
 }

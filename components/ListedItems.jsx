@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Table from './Table';
 
 function ListedItems({ table }) {
   const [data, setData] = useState([]);
@@ -14,12 +15,9 @@ function ListedItems({ table }) {
 
   return (
     <div>
-      <h1>Data from {table}</h1>
-      <ul>
-        {data.map((item) => (
-          <li key={item.id}>{item.name}</li>
-        ))}
-      </ul>
+      <h2>Data from {table}</h2>
+
+      <Table data={data} />
     </div>
   );
 }

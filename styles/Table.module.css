@@ -1,0 +1,50 @@
+.container {
+  width: 100%;
+  max-width: 600px;
+  margin: 20px auto;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: var(--color-bg, #222);
+  color: var(--color-text, #fff);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+.container ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.tableHeader,
+.tableRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.tableHeader {
+  font-weight: bold;
+  background-color: var(--color-primary, #333);
+}
+
+.tableRow:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.tableRow:hover {
+  background-color: var(--color-hover, rgba(255, 255, 255, 0.2));
+}
+
+.colRank {
+  width: 10%;
+  text-align: center;
+}
+
+.colTeam {
+  flex: 1;
+  text-align: left;
+}
+
+.colStat {
+  width: 15%;
+  text-align: center;
+}
