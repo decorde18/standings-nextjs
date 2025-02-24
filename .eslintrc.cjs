@@ -6,6 +6,7 @@ module.exports = {
     'plugin:react/jsx-runtime',
     'plugin:react-hooks/recommended',
   ],
+  parser: '@babel/eslint-parser',
   parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
   settings: { react: { version: '18.2' } },
   // plugins: ['react-refresh'],
@@ -14,11 +15,4 @@ module.exports = {
     'react/prop-types': 'off',
     'no-unused-vars': 'warn',
   },
-  // 'eslint.workingDirectories': ['Dir1', 'Dir2'],
-  // 'eslint.validate': [
-  //   'javascript',
-  //   'javascriptreact',
-  //   'typescript',
-  //   'typescriptreact',
-  // ],
 };
