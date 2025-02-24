@@ -3,11 +3,11 @@
 import { usePathname } from 'next/navigation';
 
 import AnimatedTitle from '@/components/ui/AnimatedTitle';
-import { routes } from '@/lib/ro  utes';
+import { routes } from '@/lib/routes';
 
 function HeaderIndividualPage(href) {
   const path = usePathname();
-  const pageTitle = routes.find((route) => route.href === path)?.title;
+  const pageTitle = routes.find((route) => route.href === path).title;
   const pageDescription = routes.find(
     (route) => route.href === path
   ).description;
