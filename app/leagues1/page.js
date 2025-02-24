@@ -22,6 +22,7 @@ const fields = [
     name: 'type',
     type: 'text',
     placeholder: 'Enter the type',
+    required: true,
   },
   {
     label: 'Point System',

@@ -1,6 +1,6 @@
 import HeaderIndividualPage from '@/components/HeaderIndividualPage';
 
-function Seasons({ href }) {
+function Teams({ href }) {
   return (
     <main>
       <HeaderIndividualPage href={href} />
@@ -8,4 +8,4 @@ function Seasons({ href }) {
   );
 }
 
-export default Seasons;
+export default Teams;

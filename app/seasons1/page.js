@@ -1,5 +1,6 @@
 import HeaderIndividualPage from '@/components/HeaderIndividualPage';
 
+const data = [];
 function Seasons({ href }) {
   return (
     <main>
