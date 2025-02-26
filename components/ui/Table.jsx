@@ -1,4 +1,4 @@
-import styles from '@/styles/Table.module.css';
+import styles from '@/styles/components/Table.module.css';
 
 const Table = ({ data }) => {
   return (

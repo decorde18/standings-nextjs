@@ -2,7 +2,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import styles from '@/styles/AnimatedTitle.module.css';
+import styles from '@/styles/components/AnimatedTitle.module.css';
 
 export default function AnimatedTitle({ text }) {
   return (

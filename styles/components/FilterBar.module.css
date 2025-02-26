@@ -1,0 +1,25 @@
+/* styles/NavigationBar.module.css */
+.nav {
+  padding: 6.5rem 6rem 1rem 6rem;
+  background: linear-gradient(135deg, var(--nav-bg), var(--color-accent));
+  width: 100%;
+  /* position: fixed;
+  top: 6rem;
+  left: 0;
+  */
+  /* height: 6rem; */
+  z-index: 1000;
+  box-shadow: 0 0.2rem 0.5rem var(--shadow);
+}
+
+.nav ul {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 1.5rem;
+  font-size: 1.25rem;
+}

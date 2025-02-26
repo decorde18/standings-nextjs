@@ -1,7 +1,7 @@
 // app/layout.js
 import { Geist, Geist_Mono } from 'next/font/google';
-import '../styles/globals.css';
-import styles from '../styles/Home.module.css';
+import '@/styles/globals.css';
+import styles from '@/styles/pages/Home.module.css';
 import Header from '@/components/layout/Header';
 
 const geistSans = Geist({
@@ -25,7 +25,7 @@ export default function RootLayout({ children }) {
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <Header />
         <div className={styles.pageContainer}>
-          <div className={styles.mainContainer}>{children}</div>
+          <main className={styles.mainContainer}>{children}</main>
           <footer className={styles.footer}>
             <p>
               &copy; {new Date().getFullYear()} David Cordero de Jesus Soccer

@@ -1,0 +1,25 @@
+.buttonContainer {
+  display: flex;
+  flex-direction: column;
+  margin: 1rem 0;
+}
+
+.button {
+  padding: 1rem;
+  border: 1px solid var(--color-border, #555);
+  border-radius: 0.5rem;
+  background: var(--background, #222);
+  color: var(--text-color-label, #fff);
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.3s, box-shadow 0.3s, background-color 0.3s;
+}
+
+.button:hover {
+  background-color: var(--color-accent, #007bff);
+}
+
+.button:focus {
+  border-color: var(--color-accent, #007bff);
+  box-shadow: 0 0 0.5rem rgba(0, 123, 255, 0.5);
+}

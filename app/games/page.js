@@ -1,12 +1,11 @@
 import HeaderIndividualPage from '@/components/HeaderIndividualPage';
 
-const data = [];
-function Seasons({ href }) {
+function Games({ href }) {
   return (
-    <main>
+    <div>
       <HeaderIndividualPage href={href} />
-    </main>
+    </div>
   );
 }
 
-export default Seasons;
+export default Games;

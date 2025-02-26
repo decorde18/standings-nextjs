@@ -9,10 +9,13 @@ module.exports = {
   parser: '@babel/eslint-parser',
   parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
   settings: { react: { version: '18.2' } },
-  // plugins: ['react-refresh'],
+  plugins: ['react-refresh'],
   rules: {
-    // 'react-refresh/only-export-components': 'warn',
+    'react-refresh/only-export-components': 'warn',
     'react/prop-types': 'off',
     'no-unused-vars': 'warn',
+    semi: ['error', 'always'],
+    quotes: ['error', 'single'],
+    indent: ['error', 2],
   },
 };

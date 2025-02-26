@@ -1,10 +1,12 @@
-import styles from '@/styles/Input.module.css';
+import styles from '@/styles/components/Input.module.css';
 
-const Input = ({ label, placeholder, type = 'text', ...props }) => {
+const Input = ({ id, label, name, placeholder, type = 'text', ...props }) => {
+  id = id || name;
   return (
     <div className={styles.inputContainer}>
-      <label className={styles.label}>{label}</label>
+      <label htmlFor={id}>{label}</label>
       <input
+        id={id}
         type={type}
         className={styles.input}
         placeholder={placeholder}

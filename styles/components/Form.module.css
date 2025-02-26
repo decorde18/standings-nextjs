@@ -1,0 +1,11 @@
+.form {
+  width: 100%;
+  max-width: 40rem;
+  margin: 2rem auto;
+  padding: 2rem;
+  border-radius: 0.8rem;
+  background: var(--background, #222);
+  color: var(--text-color, #fff);
+  box-shadow: 0 0.4rem 1rem var(--shadow);
+  border: var(--color-border, #222) solid 1px;
+}

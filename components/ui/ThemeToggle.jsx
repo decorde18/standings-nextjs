@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import styles from '../../styles/ThemeToggle.module.css';
+import styles from '@/styles/ThemeToggle.module.css';
 
 export default function ThemeToggle() {
   const [theme, setTheme] = useState(() => {

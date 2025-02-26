@@ -1,13 +1,13 @@
 /* styles/ThemeToggle.module.css */
 .themeToggle {
   position: fixed;
-  top: 15px;
-  right: 20px;
-  background: var(--button-bg);
-  color: var(--text-color);
+  bottom: 0.25rem;
+  left: 0.5rem;
+  background: var(--nav-bg);
+  color: var(--text-color-label);
   border: none;
-  padding: 10px 15px;
-  border-radius: 5px;
+  padding: 1rem 1.5rem;
+  border-radius: 0.5rem;
   cursor: pointer;
   font-size: 1rem;
   transition: background 0.3s ease;
@@ -15,5 +15,5 @@
 }
 
 .themeToggle:hover {
-  background: var(--button-hover-bg);
+  background: var(--primary);
 }

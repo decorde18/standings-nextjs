@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Table from './Table';
+import Table from './ui/Table';
 
 function ListedItems({ table }) {
   const [data, setData] = useState([]);

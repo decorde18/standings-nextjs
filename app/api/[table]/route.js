@@ -1,21 +1,39 @@
 import db from '@/lib/db';
+import { allowedTables } from '@/lib/tables';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-export async function GET(req) {
-  const table = req.url.split('/').pop();
+// export async function GET(req) {
+//   // Define allowed tables
+//   console.log('req', req);
+//   const url = new URL(req.nextUrl);
+//   const table = 'url.pathname.split(' / ').pop()'; // Extracts 'leagues' from '/api/leagues'
 
+//   if (!allowedTables.includes(table)) {
+//     return new Response(JSON.stringify({ error: 'Invalid table' }), {
+//       status: 400,
+//     });
+//   }
+
+//   try {
+//     const [rows] = await db.query(`SELECT * FROM ??`, [table]); // Safe query
+//     return new Response(JSON.stringify(rows), { status: 200 });
+//   } catch (error) {
+//     return new Response(JSON.stringify({ error: error.message }), {
+//       status: 500,
+//     });
+//   }
+// }
+
+export async function GET() {
   try {
-    const [rows] = await db.query(`SELECT * FROM ${table}`);
-    return new Response(JSON.stringify(rows), {
-      status: 200,
-    });
+    const [rows] = await db.query('SELECT * FROM leagues'); // Fetch leagues data
+    return Response.json(rows); // Return JSON response
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-    });
+    return Response.json({ error: error.message }, { status: 500 });
   }
 }
+
 export async function POST(req) {
   const table = 'leagues'; // You can modify this to be dynamic if needed
 

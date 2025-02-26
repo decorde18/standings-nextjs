@@ -14,7 +14,7 @@ function HeaderIndividualPage(href) {
   return (
     <>
       <AnimatedTitle text={pageTitle} />
-      <div>{pageDescription}</div>
+      <h2>{pageDescription}</h2>
     </>
   );
 }

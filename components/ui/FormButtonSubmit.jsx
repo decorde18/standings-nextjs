@@ -1,14 +1,13 @@
 'use client';
 
 import { useFormStatus } from 'react-dom';
+import Button from './Button';
 
 function FormSubmitButton() {
   const { pending } = useFormStatus();
 
   return (
-    <button disabled={pending}>
-      {pending ? 'Submitting...' : 'Share Meal'}
-    </button>
+    <Button disabled={pending}>{pending ? 'Submitting...' : 'Save'}</Button>
   );
 }
 
