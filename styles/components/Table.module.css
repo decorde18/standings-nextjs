@@ -1,51 +1,66 @@
-.container {
+.tableContainer {
+  display: flex;
+  flex-direction: column;
+  margin: 0 1rem 1rem 1rem;
+}
+
+.filterContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.table {
   width: 100%;
   max-width: 60rem;
   margin: 2rem auto;
   border-radius: 0.8rem;
   overflow: hidden;
   background-color: var(--background, #222);
-  color: var(--text-color, #fff);
+  color: var(--text-color-label, #fff);
   box-shadow: 0 0.4rem 1rem var(--shadow);
   font-size: 1.6rem;
-}
-.container ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.tableHeader,
-.tableRow {
-  display: flex;
-  justify-content: space-between;
-  padding: 1.2rem 1.6rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-collapse: collapse;
 }
 
 .tableHeader {
-  font-weight: bold;
   background-color: var(--primary, #333);
 }
 
-.tableRow:nth-child(even) {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.tableRow:hover {
-  background-color: var(--color-hover, rgba(255, 255, 255, 0.2));
-}
-
-.colRank {
-  width: 10%;
-  text-align: center;
-}
-
-.colTeam {
-  flex: 1;
+.tableHeader th {
+  padding: 1.2rem 1.6rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
   text-align: left;
 }
 
-.colStat {
-  width: 15%;
-  text-align: center;
+.tableBody {
+  display: table-row-group;
+}
+
+.tableRow {
+  display: table-row;
+}
+
+.tableRow td {
+  padding: 1.2rem 1.6rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--text-color, #fff);
+  text-align: left;
+}
+
+.tableRow:nth-child(even) td {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.tableRow:hover td {
+  background-color: var(--color-hover, rgba(255, 255, 255, 0.2));
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
 }

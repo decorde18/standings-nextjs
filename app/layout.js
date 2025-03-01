@@ -22,16 +22,16 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} ${styles.pageContainer}`}
+      >
         <Header />
-        <div className={styles.pageContainer}>
-          <main className={styles.mainContainer}>{children}</main>
-          <footer className={styles.footer}>
-            <p>
-              &copy; {new Date().getFullYear()} David Cordero de Jesus Soccer
-            </p>
-          </footer>
-        </div>
+        {/* <div className={styles.pageContainer}> */}
+        <main className={styles.mainContainer}>{children}</main>
+        <footer className={styles.footer}>
+          <p>&copy; {new Date().getFullYear()} David Cordero de Jesus Soccer</p>
+        </footer>
+        {/* </div> */}
       </body>
     </html>
   );

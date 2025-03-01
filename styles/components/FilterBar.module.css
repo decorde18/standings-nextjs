@@ -1,6 +1,7 @@
 /* styles/NavigationBar.module.css */
 .nav {
-  padding: 6.5rem 6rem 1rem 6rem;
+  margin-top: 6rem;
+  padding: 1rem 6rem 1rem 6rem;
   background: linear-gradient(135deg, var(--nav-bg), var(--color-accent));
   width: 100%;
   /* position: fixed;

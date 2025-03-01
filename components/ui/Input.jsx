@@ -7,6 +7,7 @@ const Input = ({ id, label, name, placeholder, type = 'text', ...props }) => {
       <label htmlFor={id}>{label}</label>
       <input
         id={id}
+        name={name}
         type={type}
         className={styles.input}
         placeholder={placeholder}

@@ -1,10 +1,11 @@
 import HeaderIndividualPage from '@/components/HeaderIndividualPage';
-import Input from '@/components/ui/Input';
-import ListedItems from '@/components/ListedItems';
-import Form from '@/components/ui/Form';
-import { getData } from '../api/[table]/universalRouter';
+// import Input from '@/components/ui/Input';
+// import ListedItems from '@/components/ListedItems';
+
+// import { getData } from '../api/[table]/universalRouter';
 import { Suspense } from 'react';
 import { LeaguesData } from './LeaguesData';
+import Form from '@/components/ui/Form';
 
 const fields = [
   {
@@ -37,16 +38,6 @@ const fields = [
   },
 ];
 
-// async function LeaguesData() {
-//   const leagues = await getData('leagues');
-//   return (
-//     <ul>
-//       {leagues.map((league) => (
-//         <li key={league.id}>{league.name}</li>
-//       ))}
-//     </ul>
-//   );
-// }
 function Leagues({ href }) {
   return (
     <>
@@ -54,8 +45,8 @@ function Leagues({ href }) {
       <Suspense>
         <LeaguesData />
       </Suspense>
-      {/* <ListedItems table="leagues" />
       <Form fields={fields} buttonText="Save" />
+      {/* <ListedItems table="leagues" />
       <Input
         label="Add A New League/Tournament"
         placeholder="Enter the league name"
