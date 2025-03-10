@@ -1,7 +1,9 @@
 .tableContainer {
   display: flex;
   flex-direction: column;
-  margin: 0 1rem 1rem 1rem;
+  margin: 0 auto; /* Keep margins for spacing from edges */
+  width: 100%; /* Ensure it fills the parent width */
+  padding: 0 5rem;
 }
 
 .filterContainer {
@@ -12,9 +14,8 @@
 }
 
 .table {
-  width: 100%;
-  max-width: 60rem;
-  margin: 2rem auto;
+  width: 100%; /* Remove max-width, make it full width */
+  margin: 2rem auto; /* Remove auto, keep top and bottom margins */
   border-radius: 0.8rem;
   overflow: hidden;
   background-color: var(--background, #222);
@@ -63,4 +64,12 @@
   justify-content: space-between;
   align-items: center;
   margin-top: 1rem;
+}
+
+.textLeft {
+  text-align: left;
+}
+
+.textRight {
+  text-align: right;
 }

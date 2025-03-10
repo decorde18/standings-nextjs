@@ -1,18 +1,31 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import styles from '@/styles/components/Table.module.css';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
+import Select from './ui/Select';
 
-const Table = ({ columns, data }) => {
+import { usePathname, useRouter } from 'next/navigation';
+
+const Table = ({ columns, data, rowsPerPage = 10 }) => {
+  const pathname = usePathname();
+
   const [sortConfig, setSortConfig] = useState(null);
-  const [filterInputs, setFilterInputs] = useState({});
+  const [filters, setFilters] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 5;
 
-  const sortedData = React.useMemo(() => {
+  const router = useRouter();
+
+  const handleRowClick = (rowId) => {
+    // Optimistic UI: Change row appearance
+    // ... (Add visual feedback here)
+
+    // Navigate to detail page
+    router.push(`${pathname}/${rowId}`);
+  };
+  const sortedData = useMemo(() => {
     let sortableData = [...data];
-    if (sortConfig !== null) {
+    if (sortConfig) {
       sortableData.sort((a, b) => {
         if (a[sortConfig.key] < b[sortConfig.key]) {
           return sortConfig.direction === 'ascending' ? -1 : 1;
@@ -26,32 +39,39 @@ const Table = ({ columns, data }) => {
     return sortableData;
   }, [data, sortConfig]);
 
-  const filteredData = sortedData.filter((row) => {
-    return Object.keys(filterInputs).every((key) => {
-      return row[key]
-        .toString()
-        .toLowerCase()
-        .includes(filterInputs[key].toLowerCase());
-    });
-  });
+  const filteredData = sortedData.filter((row) =>
+    filters.every(({ key, value }) =>
+      row[key]?.toString().toLowerCase().includes(value.toLowerCase())
+    )
+  );
 
   const requestSort = (key) => {
     let direction = 'ascending';
-    if (
-      sortConfig &&
-      sortConfig.key === key &&
-      sortConfig.direction === 'ascending'
-    ) {
+    if (sortConfig?.key === key && sortConfig.direction === 'ascending') {
       direction = 'descending';
     }
     setSortConfig({ key, direction });
   };
 
-  const handleFilterChange = (e, header) => {
-    setFilterInputs({
-      ...filterInputs,
-      [header]: e.target.value,
-    });
+  const handleFilterChange = (index, value) => {
+    const updatedFilters = [...filters];
+    updatedFilters[index].value = value;
+    setFilters(updatedFilters);
+  };
+
+  const handleColumnSelect = (index, column) => {
+    const updatedFilters = [...filters];
+    updatedFilters[index] = { key: column, value: '' };
+
+    setFilters(updatedFilters);
+  };
+
+  const addFilter = () => {
+    setFilters([...filters, { key: '', value: '' }]);
+  };
+
+  const removeFilter = (index) => {
+    setFilters(filters.filter((_, i) => i !== index));
   };
 
   const paginatedData = filteredData.slice(
@@ -59,38 +79,48 @@ const Table = ({ columns, data }) => {
     currentPage * rowsPerPage
   );
 
-  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+  const totalPages = Math.max(1, Math.ceil(filteredData.length / rowsPerPage));
 
   return (
     <div className={styles.tableContainer}>
       <div className={styles.filterContainer}>
-        {columns
-          .filter((column) => column?.filter !== false)
-          .map((column) => (
-            <Input
-              key={column.header}
-              value={filterInputs[column.header] || ''}
-              onChange={(e) => handleFilterChange(e, column.header)}
-              placeholder={`Search ${column.header}`}
+        {filters.map((filter, index) => (
+          <div key={index} className={styles.filterGroup}>
+            <Select
+              value={filter.key}
+              onChange={(e) => handleColumnSelect(index, e.target.value)}
+              options={columns.filter((column) => column?.filter !== false)}
             />
-          ))}
+            <Input
+              value={filter.value}
+              onChange={(e) => handleFilterChange(index, e.target.value)}
+              placeholder="Enter filter value"
+              disabled={!filter.key}
+            />
+            <Button onClick={() => removeFilter(index)}>Remove</Button>
+          </div>
+        ))}
+        <Button onClick={addFilter}>Add Filter</Button>
       </div>
       <table className={styles.table}>
-        <thead>
-          <tr className={styles.tableHeader}>
+        <thead className={styles.tableHeader}>
+          <tr>
             {columns
-              .filter((column) => column?.filter !== false)
+              .filter((column) => column.display !== false)
               .map((column) => (
                 <th
-                  key={column.header}
+                  key={column.name}
                   onClick={() => {
-                    if (column.sort !== false) requestSort(column.header);
+                    if (column.sort !== false) requestSort(column.name);
+                  }}
+                  style={{
+                    textAlign:
+                      column.align ||
+                      (column.type === 'number' ? 'right' : 'left'),
                   }}
                 >
                   {column.label}
-                  {column.sort !== false &&
-                  sortConfig &&
-                  sortConfig.key === column.header
+                  {column.sort !== false && sortConfig?.key === column.name
                     ? sortConfig.direction === 'ascending'
                       ? ' 🔼'
                       : ' 🔽'
@@ -101,11 +131,25 @@ const Table = ({ columns, data }) => {
         </thead>
         <tbody className={styles.tableBody}>
           {paginatedData.map((row, index) => (
-            <tr key={index} className={styles.tableRow}>
+            <tr
+              key={index}
+              className={styles.tableRow}
+              style={{ cursor: 'pointer' }}
+              onClick={() => handleRowClick(row.id)}
+            >
               {columns
-                .filter((column) => column?.filter !== false)
+                .filter((column) => column.display !== false)
                 .map((column) => (
-                  <td key={column.header}>{row[column.header]}</td>
+                  <td
+                    key={column.name}
+                    style={{
+                      textAlign:
+                        column.align ||
+                        (column.type === 'number' ? 'right' : 'left'),
+                    }}
+                  >
+                    {row[column.name]}
+                  </td>
                 ))}
             </tr>
           ))}

@@ -1,25 +1,24 @@
 'use client';
-
 import Table from '@/components/Table';
 import Spinner from '@/components/ui/Spinner';
-import { leaguesColumns } from '@/lib/tables';
-import { useUniversalData } from '@/lib/useUniversalData';
 
-export function LeaguesData() {
+import { teamsColumns } from '@/lib/tables';
+import { useUniversalData } from '@/lib/useUniversalData';
+import { Suspense } from 'react';
+
+export function TeamsData() {
   const {
-    data: leagues,
+    data: teams,
     isLoading,
     error,
-  } = useUniversalData({ table: 'leagues' });
+  } = useUniversalData({ table: 'teams' });
 
   if (isLoading) return <Spinner />;
   if (error) return <p className="text-red-500">Error loading data</p>;
 
   return (
-    <div className="flex-centered-columns">
-      <div className="center-column">
-        <Table columns={leaguesColumns} data={leagues || []} />
-      </div>
-    </div>
+    <Suspense fallback={<Spinner />}>
+      <Table columns={teamsColumns} data={teams} />
+    </Suspense>
   );
 }

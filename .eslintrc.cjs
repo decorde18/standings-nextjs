@@ -1,21 +1,29 @@
 module.exports = {
-  env: { browser: true, es2020: true, node: true },
+  env: {
+    browser: true,
+    node: true,
+    es2021: true,
+  },
   extends: [
     'eslint:recommended',
     'plugin:react/recommended',
-    'plugin:react/jsx-runtime',
     'plugin:react-hooks/recommended',
+    'plugin:@typescript-eslint/recommended',
   ],
-  parser: '@babel/eslint-parser',
-  parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
-  settings: { react: { version: '18.2' } },
-  plugins: ['react-refresh'],
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    ecmaVersion: 12,
+    sourceType: 'module',
+    ecmaFeatures: {
+      jsx: true,
+    },
+  },
+  plugins: ['react', 'react-hooks', '@typescript-eslint'],
   rules: {
-    'react-refresh/only-export-components': 'warn',
-    'react/prop-types': 'off',
-    'no-unused-vars': 'warn',
-    semi: ['error', 'always'],
-    quotes: ['error', 'single'],
-    indent: ['error', 2],
+    'react/prop-types': 'off', // If you don't use PropTypes
+    '@typescript-eslint/no-unused-vars': 'warn', // You can change 'warn' to 'error' if needed
+    'no-console': 'warn', // Optional: Disables the console.log rule
+    'react/jsx-uses-react': 'off', // In case you're using React 17 JSX Transform
+    'react/react-in-jsx-scope': 'off', // In case you're using React 17 JSX Transform
   },
 };

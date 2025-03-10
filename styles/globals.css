@@ -3,8 +3,10 @@
   --text-color: #030a13;
   --text-color-label: #577190;
   --primary: #0f3460;
+  --secondary: #091f3a;
   --nav-bg: #091f3a;
   --color-accent: #3f5d80;
+  --color-accent-hover: #274870;
   --color-border: #6f85a0;
   --shadow: rgba(0, 0, 0, 0.2);
 }
@@ -14,50 +16,59 @@
   --text-color: #e7ebef;
   --text-color-label: #577190;
   --primary: #274870;
+  --secondary: #091f3a;
   --nav-bg: #091f3a;
   --color-accent: #3f5d80;
+  --color-accent-hover: #274870;
   --color-border: #6f85a0;
   --shadow: rgba(255, 255, 255, 0.2);
 }
 
+/* Reset and Base Styles */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+
 html {
-  font-size: 62.5%; /* 1rem = 1rem */
+  font-size: 62.5%; /* 1rem = 10px */
   height: 100%;
 }
 
-html,
 body {
   font-family: var(--font-geist-sans), sans-serif;
   background-color: var(--background);
   color: var(--text-color);
-  height: 100%; /* Ensure the body takes full height */
+  height: 100%;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+/* Main Content Area */
 main {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
+  align-items: stretch;
   text-align: center;
   width: 100%;
   flex-grow: 1;
   padding-bottom: 2rem;
+  overflow-y: auto;
 }
+
+/* Typography */
 label {
   font-size: 1.4rem;
   margin-bottom: 0.5rem;
   color: var(--text-color-label);
 }
+
 h1,
 h2,
 h3 {
   color: var(--primary);
 }
+
 a {
   color: var(--primary);
   text-decoration: none;
@@ -66,6 +77,8 @@ a {
 a:hover {
   text-decoration: underline;
 }
+
+/* Error and Not Found Pages */
 .not-found,
 .error {
   margin-top: 5rem;
@@ -75,7 +88,6 @@ a:hover {
 .not-found h1,
 .error h1 {
   font-size: 5rem;
-  margin: rem;
   font-weight: 900;
   color: var(--text-color);
   text-transform: uppercase;
@@ -92,4 +104,37 @@ a:hover {
   font-size: 1.5rem;
   font-weight: 500;
   color: var(--text-color);
+}
+
+/* Flex Centered Columns Layout */
+.flex-centered-columns {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 0 1rem;
+}
+
+.flex-centered-columns > * {
+  flex: 0 1 auto; /* Allow columns to grow and shrink based on content */
+  margin: 0 1rem;
+  min-width: 20rem; /* Minimum width for non-center columns */
+}
+
+.flex-centered-columns > .center-column {
+  flex: 0 0 auto; /* Allow content to determine width */
+  min-width: 60rem;
+  margin: 0 1rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .flex-centered-columns {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .flex-centered-columns > * {
+    width: 100%;
+    margin: 1rem 0;
+  }
 }

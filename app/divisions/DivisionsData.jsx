@@ -2,23 +2,24 @@
 
 import Table from '@/components/Table';
 import Spinner from '@/components/ui/Spinner';
-import { leaguesColumns } from '@/lib/tables';
+import { divisionsColumns } from '@/lib/tables';
 import { useUniversalData } from '@/lib/useUniversalData';
 
-export function LeaguesData() {
+export function DivisionsData() {
   const {
-    data: leagues,
+    data: divisions,
     isLoading,
     error,
-  } = useUniversalData({ table: 'leagues' });
+  } = useUniversalData({ table: 'divisions' });
 
   if (isLoading) return <Spinner />;
   if (error) return <p className="text-red-500">Error loading data</p>;
-
+  const columns = divisionsColumns.filter((column) => column.display !== false);
+  console.log(columns);
   return (
     <div className="flex-centered-columns">
       <div className="center-column">
-        <Table columns={leaguesColumns} data={leagues || []} />
+        <Table columns={columns} data={divisions || []} />
       </div>
     </div>
   );

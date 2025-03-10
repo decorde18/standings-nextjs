@@ -5,6 +5,7 @@ const Select = ({
   label,
   name,
   options,
+  value,
   placeholder = 'Please select an option',
   ...props
 }) => {
@@ -12,7 +13,13 @@ const Select = ({
   return (
     <div className={styles.selectContainer}>
       {label && <label htmlFor={id}>{label}</label>}
-      <select id={id} className={styles.select} {...props}>
+      <select
+        id={id}
+        name={name}
+        className={styles.select}
+        defaultValue={value || ''} // Use value prop or default to empty string
+        {...props}
+      >
         {placeholder && (
           <option value="" disabled>
             {placeholder}
@@ -21,10 +28,10 @@ const Select = ({
         {options.map((option) => (
           <option
             value={option.value}
-            key={option.value}
+            key={option.name || option.value}
             disabled={option.disabled}
           >
-            {option.label}
+            {option.name}
           </option>
         ))}
       </select>
