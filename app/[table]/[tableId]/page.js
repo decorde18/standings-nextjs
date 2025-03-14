@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 
-import { useUniversalData } from '@/lib/useUniversalData';
+import { useUniversalData } from '@/hooks/useUniversalData';
 import { use } from 'react';
 
 import * as tableFields from '@/lib/tables';
@@ -12,11 +12,12 @@ import Details from '@/components/ui/Details';
 
 import HeaderIndividualPage from '@/components/HeaderIndividualPage';
 
-//todo make this dynamic
 function RecordEdit({ params }) {
   const { tableId, table } = use(params); // Accessing params correctly now
-
-  const fields = tableFields[table].filter((field) => field.editable !== false);
+  console.log(table, tableId);
+  const fields = tableFields[`${table}Columns`].filter(
+    (field) => field.editable !== false
+  );
 
   const { isLoading, error, data } = useUniversalData({
     table,

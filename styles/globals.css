@@ -122,7 +122,7 @@ a:hover {
 
 .flex-centered-columns > .center-column {
   flex: 0 0 auto; /* Allow content to determine width */
-  min-width: 60rem;
+  min-width: 40rem;
   margin: 0 1rem;
 }
 
@@ -137,4 +137,13 @@ a:hover {
     width: 100%;
     margin: 1rem 0;
   }
+}
+.sticky-header {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  background-color: var(--background); /* Adjust to match your theme */
+  z-index: 1000; /* Ensure it stays above other content */
+  padding: 1rem;
+  box-shadow: 0px 2px 5px var(--shadow);
 }

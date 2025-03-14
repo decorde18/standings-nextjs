@@ -1,7 +1,7 @@
 'use client';
 import styles from '@/styles/components/Button.module.css';
 
-//todo work on this to make a component. should mix with FormButtonSubmit
+// TODO:  work on this to make a component. should mix with FormButtonSubmit
 const Button = ({ id, name, children, type, ...props }) => {
   id = id || name;
   return (

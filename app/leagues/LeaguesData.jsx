@@ -3,7 +3,7 @@
 import Table from '@/components/Table';
 import Spinner from '@/components/ui/Spinner';
 import { leaguesColumns } from '@/lib/tables';
-import { useUniversalData } from '@/lib/useUniversalData';
+import { useUniversalData } from '@/hooks/useUniversalData';
 
 export function LeaguesData() {
   const {

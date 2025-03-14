@@ -3,7 +3,7 @@ import Table from '@/components/Table';
 import Spinner from '@/components/ui/Spinner';
 
 import { standingsColumns } from '@/lib/tables';
-import { useUniversalData } from '@/lib/useUniversalData';
+import { useUniversalData } from '@/hooks/useUniversalData';
 
 const currentLeague = [
   { team: 'team', wins: 1, losses: 2, ties: 3, points: 5, gf: 2, ga: 5 },

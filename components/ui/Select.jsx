@@ -4,12 +4,15 @@ const Select = ({
   id,
   label,
   name,
-  options,
+  options = [],
   value,
+  onChange,
   placeholder = 'Please select an option',
   ...props
 }) => {
-  id = id || name;
+  id = id || name || `select-${Math.random().toString(36).substr(2, 9)}`;
+  onChange = onChange || (() => {});
+
   return (
     <div className={styles.selectContainer}>
       {label && <label htmlFor={id}>{label}</label>}
@@ -17,7 +20,8 @@ const Select = ({
         id={id}
         name={name}
         className={styles.select}
-        defaultValue={value || ''} // Use value prop or default to empty string
+        value={value || ''} // Controlled component
+        onChange={onChange}
         {...props}
       >
         {placeholder && (
@@ -25,10 +29,11 @@ const Select = ({
             {placeholder}
           </option>
         )}
-        {options.map((option) => (
+        {options.map((option, index) => (
           <option
-            value={option.value}
-            key={option.name || option.value}
+            key={option.value?.toString() || index}
+            value={option.value?.toString() || ''}
+            label={option.label?.toString() || ''}
             disabled={option.disabled}
           >
             {option.name}

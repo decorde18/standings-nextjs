@@ -7,10 +7,32 @@
 }
 
 .filterContainer {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Two filters per row */
+  gap: 0.2rem 1rem; /* Reduced vertical space between rows (8px), horizontal gap remains the same */
+  margin-bottom: 16px;
+}
+
+.filterGroup {
   display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  align-items: center;
+  gap: 0.2rem; /* Smaller gap between Select and Input */
+}
+
+.filterGroup Select,
+.filterGroup Input {
+  flex-grow: 1; /* Ensures they take equal space within the filter group */
+}
+
+.filterGroup Button {
+  margin-left: 0.8rem; /* Adds spacing to the button */
+}
+
+/* Ensure the "Add Filter" button has a proper width */
+.addFilterButton {
+  width: auto; /* Makes the button take only the space it needs */
+  min-width: 12rem; /* Optional: You can set a minimum width */
+  align-self: flex-start; /* Aligns the button to the start */
 }
 
 .table {
@@ -21,7 +43,7 @@
   background-color: var(--background, #222);
   color: var(--text-color-label, #fff);
   box-shadow: 0 0.4rem 1rem var(--shadow);
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   border-collapse: collapse;
 }
 
@@ -45,18 +67,22 @@
 }
 
 .tableRow td {
-  padding: 1.2rem 1.6rem;
+  padding: 0.9rem 1.6rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   color: var(--text-color, #fff);
   text-align: left;
 }
 
-.tableRow:nth-child(even) td {
+/* .tableRow:nth-child(even) td {
   background-color: rgba(255, 255, 255, 0.1);
-}
+} */
 
 .tableRow:hover td {
-  background-color: var(--color-hover, rgba(255, 255, 255, 0.2));
+  background-color: var(--color-accent-hover, rgba(255, 255, 255, 0.2));
+}
+.selected td {
+  background-color: var(--primary, rgba(255, 255, 255, 0.2));
+  color: var(--text-color-label, #fff);
 }
 
 .pagination {
@@ -72,4 +98,9 @@
 
 .textRight {
   text-align: right;
+}
+@media (max-width: 600px) {
+  .filterContainer {
+    grid-template-columns: 1fr; /* Stack the filters vertically on small screens */
+  }
 }

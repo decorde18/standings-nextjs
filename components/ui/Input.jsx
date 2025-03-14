@@ -1,6 +1,6 @@
 import styles from '@/styles/components/Input.module.css';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const Input = ({
   id,
@@ -12,29 +12,30 @@ const Input = ({
   onChange,
   ...props
 }) => {
-  const [inputValue, setInputValue] = useState(value || ''); // Set initial state to value or empty string
-  // Handle the input change event
+  const [inputValue, setInputValue] = useState(value ?? ''); // Use `??` to handle null/undefined
+
+  useEffect(() => {
+    setInputValue(value ?? ''); // Ensure value is never null
+  }, [value]);
+
   const handleChange = (e) => {
-    setInputValue(e.target.value); // Update local state with new value
+    setInputValue(e.target.value);
     if (onChange) {
-      onChange(e); // Call the passed onChange function from parent if it exists
+      onChange(e);
     }
   };
 
-  id = id || name;
-  placeholder = value || placeholder || '';
-
   return (
     <div className={styles.inputContainer}>
-      <label htmlFor={id}>{label}</label>
+      <label htmlFor={id || name}>{label}</label>
       <input
-        id={id}
+        className={styles.input}
+        id={id || name}
         name={name}
         type={type}
-        className={styles.input}
-        placeholder={placeholder}
-        value={inputValue} // Control value via local state
-        onChange={handleChange} // Handle changes to input value
+        placeholder={placeholder || ''}
+        value={inputValue} // Ensures no null values
+        onChange={handleChange}
         {...props}
       />
     </div>

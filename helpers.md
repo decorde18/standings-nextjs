@@ -1,5 +1,5 @@
 - GET DATA
-  const {isLoading,error, data = }useUniversalData({ table, filter : {}, sort, search })
+  const {isLoading,error, data }= useUniversalData({ table, filter : {}, sort, search })
 
 - POST DATA
   const { create } = useUniversalData({ table: 'leagues' });
@@ -36,9 +36,37 @@
 
 -- BUTTON
 const Button = ({ id, name, children, type, ...props })
+--AddItemButton
+function AddItemButton({ table, label, queryParams = {{ league_id: league.id }} })
 
 --FORM
 const Form = ({ fields, table, initialData, redirectPath })
 
 --TABLE
-const Table = ({ columns, data, rowsPerPage = 20 })
+const Table = ({ columns, data, handleInput, handleSelect, handleRow,
+selected,
+handleDelete,rowsPerPage = 20 })
+
+-- INPUT
+const Input = ({
+id,
+label,
+name,
+value,
+placeholder,
+type = 'text',
+onChange,
+
+...props
+})
+
+-- SELECT
+const Select = ({
+id,
+label,
+name,
+options = [],
+value,
+onChange,
+placeholder = 'Please select an option',
+...props

@@ -6,23 +6,34 @@ import Input from '@/components/ui/Input';
 import Select from './ui/Select';
 
 import { usePathname, useRouter } from 'next/navigation';
+import { formatDate, formatTime } from '@/utils/dataHelpers';
 
-const Table = ({ columns, data, rowsPerPage = 10 }) => {
+const Table = ({
+  columns,
+  data,
+  handleRow,
+  selected,
+  handleDelete,
+  handleInput,
+  handleSelect,
+  rowsPerPage = 10,
+}) => {
   const pathname = usePathname();
 
   const [sortConfig, setSortConfig] = useState(null);
   const [filters, setFilters] = useState([]);
+  const [currentRow, setCurrentRow] = useState(+selected);
   const [currentPage, setCurrentPage] = useState(1);
 
   const router = useRouter();
 
   const handleRowClick = (rowId) => {
-    // Optimistic UI: Change row appearance
-    // ... (Add visual feedback here)
+    setCurrentRow(rowId);
 
-    // Navigate to detail page
-    router.push(`${pathname}/${rowId}`);
+    if (handleRow) handleRow(rowId);
+    else router.push(`${pathname}/${rowId}`);
   };
+
   const sortedData = useMemo(() => {
     let sortableData = [...data];
     if (sortConfig) {
@@ -40,9 +51,10 @@ const Table = ({ columns, data, rowsPerPage = 10 }) => {
   }, [data, sortConfig]);
 
   const filteredData = sortedData.filter((row) =>
-    filters.every(({ key, value }) =>
-      row[key]?.toString().toLowerCase().includes(value.toLowerCase())
-    )
+    filters.every(({ key, value }) => {
+      if (!key || !value) return true; // Skip filters that aren't set properly
+      return row[key]?.toString().toLowerCase().includes(value.toLowerCase());
+    })
   );
 
   const requestSort = (key) => {
@@ -60,9 +72,9 @@ const Table = ({ columns, data, rowsPerPage = 10 }) => {
   };
 
   const handleColumnSelect = (index, column) => {
+    console.log(index, column);
     const updatedFilters = [...filters];
     updatedFilters[index] = { key: column, value: '' };
-
     setFilters(updatedFilters);
   };
 
@@ -89,7 +101,12 @@ const Table = ({ columns, data, rowsPerPage = 10 }) => {
             <Select
               value={filter.key}
               onChange={(e) => handleColumnSelect(index, e.target.value)}
-              options={columns.filter((column) => column?.filter !== false)}
+              options={columns
+                .filter((column) => column?.filter !== false)
+                .map((column) => ({
+                  value: column.name, // Use `name` as the value of the select
+                  label: column.label, // Display label as the option text
+                }))}
             />
             <Input
               value={filter.value}
@@ -100,7 +117,12 @@ const Table = ({ columns, data, rowsPerPage = 10 }) => {
             <Button onClick={() => removeFilter(index)}>Remove</Button>
           </div>
         ))}
-        <Button onClick={addFilter}>Add Filter</Button>
+        <Button
+          onClick={addFilter}
+          style={{ width: 'auto', minWidth: '120px', alignSelf: 'flex-start' }}
+        >
+          Add Filter
+        </Button>
       </div>
       <table className={styles.table}>
         <thead className={styles.tableHeader}>
@@ -127,13 +149,17 @@ const Table = ({ columns, data, rowsPerPage = 10 }) => {
                     : null}
                 </th>
               ))}
+            {handleDelete && <th></th>}
           </tr>
         </thead>
         <tbody className={styles.tableBody}>
           {paginatedData.map((row, index) => (
             <tr
               key={index}
-              className={styles.tableRow}
+              className={`
+                ${styles.tableRow} 
+                ${currentRow === row.id && styles.selected} 
+                `}
               style={{ cursor: 'pointer' }}
               onClick={() => handleRowClick(row.id)}
             >
@@ -148,9 +174,43 @@ const Table = ({ columns, data, rowsPerPage = 10 }) => {
                         (column.type === 'number' ? 'right' : 'left'),
                     }}
                   >
-                    {row[column.name]}
+                    {column.input !== true ? (
+                      column.type === 'date' ? (
+                        formatDate(row[column.name])
+                      ) : column.type === 'time' ? (
+                        formatTime(row[column.name])
+                      ) : (
+                        row[column.name]
+                      )
+                    ) : (
+                      <Input
+                        name={column.name}
+                        value={row[column.name]}
+                        type={column.type}
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent row click
+                        }}
+                        onBlur={(e) =>
+                          handleInput({
+                            name: e.target.id,
+                            value: e.target.value,
+                            rowId: row.id,
+                          })
+                        }
+                      />
+                    )}
                   </td>
                 ))}
+              {handleDelete && (
+                <td
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent row click
+                    handleDelete(row.id);
+                  }}
+                >
+                  🗑️
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

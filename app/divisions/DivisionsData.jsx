@@ -3,7 +3,7 @@
 import Table from '@/components/Table';
 import Spinner from '@/components/ui/Spinner';
 import { divisionsColumns } from '@/lib/tables';
-import { useUniversalData } from '@/lib/useUniversalData';
+import { useUniversalData } from '@/hooks/useUniversalData';
 
 export function DivisionsData() {
   const {
@@ -15,7 +15,7 @@ export function DivisionsData() {
   if (isLoading) return <Spinner />;
   if (error) return <p className="text-red-500">Error loading data</p>;
   const columns = divisionsColumns.filter((column) => column.display !== false);
-  console.log(columns);
+
   return (
     <div className="flex-centered-columns">
       <div className="center-column">

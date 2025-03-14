@@ -1,9 +1,11 @@
 import Form from '@/components/ui/Form';
 import * as tableFields from '@/lib/tables';
 
-function page({ params }) {
-  const table = params.tableItem;
-  const fields = tableFields[table].filter((field) => field.editable !== false);
+async function page({ params }) {
+  const table = await params.tableItem;
+  const fields = tableFields[`${table}Columns`].filter(
+    (field) => field.editable !== false
+  );
 
   return (
     <div className="flex-centered-columns">

@@ -1,14 +1,9 @@
-/* styles/NavigationBar.module.css */
 .nav {
-  margin-top: 6rem;
-  padding: 1rem 6rem 1rem 6rem;
+  margin-top: 6rem; /* Pushes down the filter bar below the header */
+  padding: 1rem 6rem;
   background: linear-gradient(135deg, var(--nav-bg), var(--color-accent));
   width: 100%;
-  /* position: fixed;
-  top: 6rem;
-  left: 0;
-  */
-  /* height: 6rem; */
+  position: relative; /* Ensures it stays in flow but below the header */
   z-index: 1000;
   box-shadow: 0 0.2rem 0.5rem var(--shadow);
 }
@@ -20,7 +15,11 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
   gap: 1.5rem;
   font-size: 1.25rem;
+  flex-wrap: wrap; /* Prevents overflow if needed */
+}
+
+.nav ul li {
+  min-width: 12rem; /* Ensures consistent spacing */
 }

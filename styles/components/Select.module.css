@@ -2,19 +2,40 @@
   display: flex;
   flex-direction: column;
   margin: 0 1rem 1rem 1rem;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.selectContainer label {
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  font-size: 1.5rem; /* Match select font size */
 }
 
 .select {
-  padding: 0.75rem;
+  width: 100%;
+  min-width: 16rem; /* Increased width */
+  max-width: 20rem; /* Adjust max width */
+  height: 3.75rem; /* Slightly larger height for better spacing */
+  padding: 0.75rem 1.25rem; /* More padding to accommodate larger font */
   border: 1px solid var(--color-border, #555);
   border-radius: 0.5rem;
   background: var(--background, #222);
   color: var(--text-color, #fff);
+  font-size: 1.35rem; /* Larger text */
+  font-weight: normal; /* Prevents text width from shifting */
   outline: none;
-  transition: border-color 0.3s, box-shadow 0.3s;
+  box-sizing: border-box; /* Prevents padding from affecting total size */
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
 .select:focus {
   border-color: var(--color-accent, #007bff);
-  box-shadow: 0 0 0.5rem rgba(0, 123, 255, 0.5);
+  box-shadow: 0 0 5px var(--color-accent);
+}
+
+.select option {
+  font-size: 1.35rem; /* Ensures options use the same font size */
+  font-weight: normal;
+  padding: 0.75rem; /* Ensures options don't resize */
 }

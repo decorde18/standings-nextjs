@@ -11,10 +11,10 @@ function HeaderIndividualPage({ href, title, description }) {
   const pageDescription =
     description || routes.find((route) => route.href === path)?.description;
   return (
-    <>
+    <header className="sticky-header">
       <AnimatedTitle text={pageTitle} />
       <h2>{pageDescription}</h2>
-    </>
+    </header>
   );
 }
 

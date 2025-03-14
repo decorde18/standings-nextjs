@@ -3,7 +3,7 @@ import Table from '@/components/Table';
 import Spinner from '@/components/ui/Spinner';
 
 import { teamsColumns } from '@/lib/tables';
-import { useUniversalData } from '@/lib/useUniversalData';
+import { useUniversalData } from '@/hooks/useUniversalData';
 import { Suspense } from 'react';
 
 export function TeamsData() {
@@ -17,8 +17,10 @@ export function TeamsData() {
   if (error) return <p className="text-red-500">Error loading data</p>;
 
   return (
-    <Suspense fallback={<Spinner />}>
-      <Table columns={teamsColumns} data={teams} />
-    </Suspense>
+    <div className="flex-centered-columns">
+      <div className="center-column">
+        <Table columns={teamsColumns} data={teams} />
+      </div>
+    </div>
   );
 }

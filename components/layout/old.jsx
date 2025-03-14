@@ -4,65 +4,58 @@ import styles from '@/styles/components/FilterBar.module.css';
 import Select from '../ui/Select';
 import { useUniversalData } from '@/hooks/useUniversalData';
 import { useEffect, useState } from 'react';
-import {
-  useDivisionLeagueId,
-  useSeasonId,
-  useLeague,
-  useDivision,
-} from '@/hooks/useQueryParams';
+import { useDivisionLeagueId } from '@/hooks/useQueryParams';
 
 export default function FilterBar() {
-  // State for options arrays for each select field.
+  // Options for select fields
   const [leagueOptions, setLeagueOptions] = useState([]);
   const [seasonOptions, setSeasonOptions] = useState([]);
   const [divisionOptions, setDivisionOptions] = useState([]);
 
-  // Use our query param hooks as our source of truth.
-  const { value: dlid, setValue: setDlid } = useDivisionLeagueId();
-  const { value: selectedDivision, setValue: setDivision } = useDivision();
-  const { value: selectedSeason, setValue: setSeasonId } = useSeasonId();
-  const { value: selectedLeague, setValue: setLeagueId } = useLeague();
+  // Local state for current selections
+  const [selectedLeague, setSelectedLeague] = useState('');
+  const [selectedSeason, setSelectedSeason] = useState('');
+  const [selectedDivision, setSelectedDivision] = useState('');
 
-  // Fetch universal data.
+  // Our composite query parameter hook
+  const { dlid, setDlid } = useDivisionLeagueId();
+
   const { isLoading, error, data } = useUniversalData({
     table: 'divisions_leagues',
   });
 
-  // When a composite id (dlid) exists, pre-populate our filters.
+  // When data loads and dlid exists, find the record and hydrate state.
   useEffect(() => {
     if (data && Array.isArray(data) && dlid) {
       const record = data.find((item) => String(item.id) === dlid);
       if (record) {
-        // Setting values from the record.
-        // (Assumes record.league_id, record.season_id, record.division_id are compatible types.)
-        setLeagueId(record.league_id);
-        setSeasonId(record.season_id);
-        setDivision(record.division_id);
-      } else {
-        // Clear values if record is not found.
-        setDivision('');
-        setDlid('');
+        setSelectedLeague(record.league_id);
+        setSelectedSeason(record.season_id);
+        setSelectedDivision(record.division_id);
       }
     }
   }, [data, dlid]);
 
-  // Build league options from the data.
+  // Build options for leagues
   useEffect(() => {
     if (!data || !Array.isArray(data)) return;
     const opts = Array.from(
       new Map(data.map((item) => [item.league_id, item])).values()
-    ).map((item) => ({ value: item.league_id, name: item.league_name }));
+    ).map((item) => ({
+      value: item.league_id,
+      name: item.league_name,
+    }));
     setLeagueOptions(opts);
   }, [data]);
 
-  // Build season options based on the selected league.
+  // Build season options based on selected league
   useEffect(() => {
     if (!data || !Array.isArray(data) || !selectedLeague) {
       setSeasonOptions([]);
       return;
     }
     const filtered = data.filter(
-      (item) => item.league_id === Number(selectedLeague) // Consider storing as string
+      (item) => item.league_id === Number(selectedLeague)
     );
     const opts = Array.from(
       new Map(filtered.map((item) => [item.season_id, item])).values()
@@ -71,9 +64,15 @@ export default function FilterBar() {
       name: `${item.season} ${item.year}`,
     }));
     setSeasonOptions(opts);
-  }, [data, selectedLeague]);
+    // If the current selected season isn’t valid, reset it.
+    if (!opts.some((o) => o.value === Number(selectedSeason))) {
+      setSelectedSeason('');
+      setSelectedDivision('');
+      setDlid(''); // also clear the composite param
+    }
+  }, [data, selectedLeague, selectedSeason, setDlid]);
 
-  // Build division options based on selected league and season.
+  // Build division options based on selected league and season
   useEffect(() => {
     if (!data || !Array.isArray(data) || !selectedLeague || !selectedSeason) {
       setDivisionOptions([]);
@@ -97,41 +96,54 @@ export default function FilterBar() {
       }`,
     }));
     setDivisionOptions(opts);
-  }, [data, selectedLeague, selectedSeason]);
+    if (!opts.some((o) => o.value === Number(selectedDivision))) {
+      setSelectedDivision('');
+      setDlid('');
+    }
+  }, [data, selectedLeague, selectedSeason, selectedDivision, setDlid]);
 
-  // Event handlers update the query params via our hooks.
+  // Helper to update the composite query parameter
+  const updateCompositeQuery = (newLeague, newSeason, newDivision) => {
+    // Look up a record that matches the combination
+    if (data && Array.isArray(data)) {
+      const record = data.find(
+        (item) =>
+          item.league_id === Number(newLeague) &&
+          item.season_id === Number(newSeason) &&
+          item.division_id === Number(newDivision)
+      );
+      if (record) {
+        setDlid(String(record.id));
+      } else {
+        setDlid('');
+      }
+    }
+  };
+
+  // Handlers: when the user changes a field, update local state and then update the composite query
   const handleLeagueChange = (e) => {
     const newLeague = e.target.value;
-    // Clear dependent fields immediately.
-    setDlid('');
-    setDivision('');
-    setSeasonId('');
-    setLeagueId(newLeague);
+    setSelectedLeague(newLeague);
+    // When league changes, reset season and division.
+    setSelectedSeason('');
+    setSelectedDivision('');
+    updateCompositeQuery(newLeague, '', '');
   };
 
   const handleSeasonChange = (e) => {
     const newSeason = e.target.value;
-    // Clear dependent fields.
-    setDlid('');
-    setDivision('');
-    setSeasonId(newSeason);
+    setSelectedSeason(newSeason);
+    // Reset division when season changes.
+    setSelectedDivision('');
+    updateCompositeQuery(selectedLeague, newSeason, '');
   };
 
   const handleDivisionChange = (e) => {
     const newDivision = e.target.value;
-    // Look up the composite record to update dlid.
-    const record = data.find(
-      (item) =>
-        item.league_id === Number(selectedLeague) &&
-        item.season_id === Number(selectedSeason) &&
-        item.division_id === Number(newDivision)
-    );
-    if (record) {
-      setDlid(String(record.id));
-    }
+    setSelectedDivision(newDivision);
+    updateCompositeQuery(selectedLeague, selectedSeason, newDivision);
   };
 
-  // Early return if data is not loaded or an error occurred.
   if (!data || isLoading) return null;
   if (error) return <div>ERROR</div>;
 

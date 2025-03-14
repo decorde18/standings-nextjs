@@ -6,7 +6,7 @@ import styles from '@/styles/components/Form.module.css';
 import FormSubmitButton from './FormButtonSubmit';
 import Input from './Input';
 import Select from './Select';
-import { useUniversalData } from '@/lib/useUniversalData';
+import { useUniversalData } from '@/hooks/useUniversalData';
 
 const Form = ({ fields, table, initialData, redirectPath }) => {
   const { create, update } = useUniversalData({ table });
@@ -15,7 +15,7 @@ const Form = ({ fields, table, initialData, redirectPath }) => {
   const searchParams = useSearchParams();
   const initialValues = Object.fromEntries(searchParams.entries());
   const router = useRouter();
-  //todo the params allows for values to be added that aren't needed in the fields ie league_id passed from the league to create the division. if it is not necessary, let's remove
+  // TODO: the params allows for values to be added that aren't needed in the fields ie league_id passed from the league to create the division. if it is not necessary, let's remove
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsLoading(true);
@@ -38,9 +38,10 @@ const Form = ({ fields, table, initialData, redirectPath }) => {
       }
 
       // Redirect logic
-      if (redirectPath === 'previous') {
-        router.back();
-      } else if (redirectPath) {
+      // if (redirectPath === 'previous') {
+      //   router.back();
+      // } else
+      if (redirectPath) {
         router.push(redirectPath);
       } else {
         router.push(`/${table}`);

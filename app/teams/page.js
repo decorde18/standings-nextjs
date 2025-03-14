@@ -1,16 +1,19 @@
 import HeaderIndividualPage from '@/components/HeaderIndividualPage';
-import Table from '@/components/Table';
-import Form from '@/components/ui/Form';
-import { teamsColumns } from '@/lib/tables';
+
 import { TeamsData } from './TeamsData';
+import Spinner from '@/components/ui/Spinner';
+import { Suspense } from 'react';
+import AddItemButton from '@/components/ui/AddItemButton';
 
 function Games({ href }) {
   return (
-    <div>
+    <>
       <HeaderIndividualPage href={href} />
-      <Form fields={teamsColumns} buttonText="Save" />
-      <TeamsData href={href} />
-    </div>
+      <Suspense fallback={<Spinner />}>
+        <TeamsData href={href} />
+      </Suspense>
+      <AddItemButton table="teams" label="Add Team" />
+    </>
   );
 }
 
