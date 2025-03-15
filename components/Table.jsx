@@ -21,7 +21,7 @@ const Table = ({
   const pathname = usePathname();
 
   const [sortConfig, setSortConfig] = useState(null);
-  const [filters, setFilters] = useState([]);
+  const [filters, setFilters] = useState([{ key: '', value: '' }]);
   const [currentRow, setCurrentRow] = useState(+selected);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -72,7 +72,6 @@ const Table = ({
   };
 
   const handleColumnSelect = (index, column) => {
-    console.log(index, column);
     const updatedFilters = [...filters];
     updatedFilters[index] = { key: column, value: '' };
     setFilters(updatedFilters);
@@ -95,6 +94,18 @@ const Table = ({
 
   return (
     <div className={styles.tableContainer}>
+      <div className={styles.addFilterContainer}>
+        <Button
+          onClick={addFilter}
+          style={{
+            width: 'auto',
+            minWidth: '18rem',
+            alignSelf: 'flex-start',
+          }}
+        >
+          Add Filter
+        </Button>
+      </div>
       <div className={styles.filterContainer}>
         {filters.map((filter, index) => (
           <div key={index} className={styles.filterGroup}>
@@ -104,8 +115,8 @@ const Table = ({
               options={columns
                 .filter((column) => column?.filter !== false)
                 .map((column) => ({
-                  value: column.name, // Use `name` as the value of the select
-                  label: column.label, // Display label as the option text
+                  value: column.name,
+                  label: column.label,
                 }))}
             />
             <Input
@@ -117,12 +128,6 @@ const Table = ({
             <Button onClick={() => removeFilter(index)}>Remove</Button>
           </div>
         ))}
-        <Button
-          onClick={addFilter}
-          style={{ width: 'auto', minWidth: '120px', alignSelf: 'flex-start' }}
-        >
-          Add Filter
-        </Button>
       </div>
       <table className={styles.table}>
         <thead className={styles.tableHeader}>
@@ -155,11 +160,10 @@ const Table = ({
         <tbody className={styles.tableBody}>
           {paginatedData.map((row, index) => (
             <tr
-              key={index}
-              className={`
-                ${styles.tableRow} 
-                ${currentRow === row.id && styles.selected} 
-                `}
+              key={row.id || index}
+              className={`${styles.tableRow} ${
+                currentRow === row.id && styles.selected
+              }`}
               style={{ cursor: 'pointer' }}
               onClick={() => handleRowClick(row.id)}
             >
@@ -168,6 +172,7 @@ const Table = ({
                 .map((column) => (
                   <td
                     key={column.name}
+                    className={column.bold === true ? styles.boldColumn : ''}
                     style={{
                       textAlign:
                         column.align ||
@@ -204,7 +209,7 @@ const Table = ({
               {handleDelete && (
                 <td
                   onClick={(e) => {
-                    e.stopPropagation(); // Prevent row click
+                    e.stopPropagation();
                     handleDelete(row.id);
                   }}
                 >
@@ -216,23 +221,25 @@ const Table = ({
         </tbody>
       </table>
       <div className={styles.pagination}>
-        <Button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-        >
-          Previous
-        </Button>
-        <span>
-          Page {currentPage} of {totalPages}
-        </span>
-        <Button
-          onClick={() =>
-            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-          }
-          disabled={currentPage === totalPages}
-        >
-          Next
-        </Button>
+        <div className={styles.paginationControls}>
+          <Button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </Button>
+          <span>
+            Page {currentPage} of {totalPages}
+          </span>
+          <Button
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </Button>
+        </div>
       </div>
     </div>
   );

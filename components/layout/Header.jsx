@@ -1,4 +1,4 @@
-import ThemeToggle from '../ui/ThemeToggle';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 
 import NavigationBar from './NavigationBar';
 

@@ -10,3 +10,8 @@ work on games
 work on scores
 
 work on standings
+
+// TODO: on add, need to add divisionLeague categories
+// TODO: on add, disable button so can't click 2x
+// TODO: no spinner when adding a game and the DB is delayed
+// TODO: similarly for clicking on links

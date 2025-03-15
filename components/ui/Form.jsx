@@ -23,16 +23,23 @@ const Form = ({ fields, table, initialData, redirectPath }) => {
 
     const formData = new FormData(event.target);
     const formDataObject = Object.fromEntries(formData);
-    const mergedData = { ...initialValues, ...formDataObject };
+
+    // Filter out null or empty values
+    const filteredData = Object.fromEntries(
+      Object.entries({ ...initialValues, ...formDataObject }).filter(
+        ([_, value]) => value !== null && value !== '' // Remove null/empty values
+      )
+    );
+
     try {
       if (initialData) {
         // Update existing data
-        await update({ table, id: initialData.id, data: mergedData });
+        await update({ table, id: initialData.id, data: filteredData });
         console.log(`${table} updated successfully!`);
         setFormMessage('Data updated successfully!');
       } else {
         // Create new data
-        await create({ table, data: mergedData });
+        await create({ table, data: filteredData });
         console.log(`${table} created successfully!`);
         setFormMessage('Data created successfully!');
       }
@@ -41,6 +48,7 @@ const Form = ({ fields, table, initialData, redirectPath }) => {
       // if (redirectPath === 'previous') {
       //   router.back();
       // } else
+
       if (redirectPath) {
         router.push(redirectPath);
       } else {

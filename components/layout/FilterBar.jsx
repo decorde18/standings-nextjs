@@ -1,7 +1,7 @@
 'use client';
 
 import styles from '@/styles/components/FilterBar.module.css';
-import Select from '../ui/Select';
+
 import { useUniversalData } from '@/hooks/useUniversalData';
 import { useEffect, useState } from 'react';
 import {
@@ -10,6 +10,7 @@ import {
   useLeague,
   useDivision,
 } from '@/hooks/useQueryParams';
+import Select from '@/components/ui/Select';
 
 export default function FilterBar() {
   const [leagueOptions, setLeagueOptions] = useState([]);

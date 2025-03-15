@@ -14,7 +14,7 @@ import HeaderIndividualPage from '@/components/HeaderIndividualPage';
 
 function RecordEdit({ params }) {
   const { tableId, table } = use(params); // Accessing params correctly now
-  console.log(table, tableId);
+
   const fields = tableFields[`${table}Columns`].filter(
     (field) => field.editable !== false
   );

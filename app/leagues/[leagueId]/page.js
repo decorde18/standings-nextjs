@@ -1,176 +1,226 @@
 'use client';
 
-import styles from '@/styles/components/FilterBar.module.css';
-import Select from '../ui/Select';
-import { useUniversalData } from '@/hooks/useUniversalData';
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import { use } from 'react';
+import { useLeagueDetailsData } from '@/hooks/useLeagueDetails';
 import {
-  useDivisionLeagueId,
   useSeasonId,
-  useLeague,
-  useDivision,
+  useDivisionLeagueId,
+  useQueryParam,
 } from '@/hooks/useQueryParams';
+// import { useDivisionLeagueId } from '@/hooks/useDivisionLeagueId';
 
-export default function FilterBar() {
-  // State for options arrays for each select field.
-  const [leagueOptions, setLeagueOptions] = useState([]);
-  const [seasonOptions, setSeasonOptions] = useState([]);
-  const [divisionOptions, setDivisionOptions] = useState([]);
+import {
+  addDivisionToLeague,
+  addTeamToLeague,
+  removeDivisionFromLeague,
+  removeTeamFromLeague,
+} from '@/lib/leagueActions';
+import * as tableFields from '@/lib/tables';
 
-  // Use our query param hooks as our source of truth.
-  const { value: dlid, setValue: setDlid } = useDivisionLeagueId();
-  const { value: selectedDivision, setValue: setDivision } = useDivision();
-  const { value: selectedSeason, setValue: setSeasonId } = useSeasonId();
-  const { value: selectedLeague, setValue: setLeagueId } = useLeague();
+import Form from '@/components/ui/Form';
+import Spinner from '@/components/ui/Spinner';
+import Details from '@/components/ui/Details';
+import Table from '@/components/Table';
+import HeaderIndividualPage from '@/components/HeaderIndividualPage';
+import AddItemButton from '@/components/ui/AddItemButton';
+import Button from '@/components/ui/Button';
+import { useSearchParams } from 'next/navigation';
 
-  // Fetch universal data.
-  const { isLoading, error, data } = useUniversalData({
-    table: 'divisions_leagues',
-  });
+function LeagueDetails({ params }) {
+  // Get leagueId from params (wrapped in use())
+  const { leagueId } = use(params);
 
-  // When a composite id (dlid) exists, pre-populate our filters.
+  const searchParams = useSearchParams();
+  // const dlid = searchParams.get('dlid');
+  const seasonid = searchParams.get('season_id');
+  // Use the separate season hook as fallback.
+  const { value: seasonId, setValue: setSeasonId } = useSeasonId();
+
+  const { value: dlid, setValue: setDlid } = useQueryParam('dlid');
+  // const { dlid, setDlid } = useDivisionLeagueId();
+  // TODO: go through evaluate dlid and possibly change dlid back to params and then new logic for updating dlid
+  // Local state to hold effective values.
+  const [effectiveSeason, setEffectiveSeason] = useState('');
+  const [effectiveDivision, setEffectiveDivision] = useState('');
+  const [localDivision, setLocalDivision] = useState(''); // separate from composite
+
+  const {
+    isLoading,
+    error,
+    league,
+    divisions,
+    divisionsLeague, // array of records linking league/division/season
+    seasons,
+    teams,
+    teamsLeagues,
+    create,
+    deleteRecord,
+  } = useLeagueDetailsData(leagueId, effectiveSeason, effectiveDivision);
+  // Other local state for UI:
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [viewTeams, setViewTeams] = useState(false);
+
   useEffect(() => {
-    if (data && Array.isArray(data) && dlid) {
-      const record = data.find((item) => String(item.id) === dlid);
-      if (record) {
-        // Setting values from the record.
-        // (Assumes record.league_id, record.season_id, record.division_id are compatible types.)
-        setLeagueId(record.league_id);
-        setSeasonId(record.season_id);
-        setDivision(record.division_id);
-      } else {
-        // Clear values if record is not found.
-        setDivision('');
-        setDlid('');
-      }
+    // We'll derive effectiveSeason and effectiveDivision from dlid if available,
+    // otherwise we use seasonId and a local division state.
+    if (!divisionsLeague || !divisionsLeague.length) return;
+
+    const season = dlid
+      ? divisionsLeague.find((div) => div.id === +dlid)?.season_id
+      : seasonid;
+    if (!season) return;
+    setEffectiveSeason(season);
+  }, [divisionsLeague, dlid, seasonid]);
+
+  function handleSelectSeason(rowId) {
+    // If there's a composite selection, clear it.
+    if (dlid) {
+      setDlid('');
     }
-  }, [data, dlid]);
+    setSeasonId(rowId); // This updates the separate season query param.
+  }
 
-  // Build league options from the data.
-  useEffect(() => {
-    if (!data || !Array.isArray(data)) return;
-    const opts = Array.from(
-      new Map(data.map((item) => [item.league_id, item])).values()
-    ).map((item) => ({ value: item.league_id, name: item.league_name }));
-    setLeagueOptions(opts);
-  }, [data]);
-
-  // Build season options based on the selected league.
-  useEffect(() => {
-    if (!data || !Array.isArray(data) || !selectedLeague) {
-      setSeasonOptions([]);
-      return;
-    }
-    const filtered = data.filter(
-      (item) => item.league_id === Number(selectedLeague) // Consider storing as string
-    );
-    const opts = Array.from(
-      new Map(filtered.map((item) => [item.season_id, item])).values()
-    ).map((item) => ({
-      value: item.season_id,
-      name: `${item.season} ${item.year}`,
-    }));
-    setSeasonOptions(opts);
-  }, [data, selectedLeague]);
-
-  // Build division options based on selected league and season.
-  useEffect(() => {
-    if (!data || !Array.isArray(data) || !selectedLeague || !selectedSeason) {
-      setDivisionOptions([]);
-      return;
-    }
-    const filtered = data.filter(
-      (item) =>
-        item.league_id === Number(selectedLeague) &&
-        item.season_id === Number(selectedSeason)
-    );
-    const opts = Array.from(
-      new Map(filtered.map((item) => [item.division_id, item])).values()
-    ).map((item) => ({
-      value: item.division_id,
-      name: `D${item.level} ${item.division_name} ${
-        item.gender === 'F'
-          ? 'Women'
-          : item.gender === 'M'
-          ? 'Men'
-          : item.gender
-      }`,
-    }));
-    setDivisionOptions(opts);
-  }, [data, selectedLeague, selectedSeason]);
-
-  // Event handlers update the query params via our hooks.
-  const handleLeagueChange = (e) => {
-    const newLeague = e.target.value;
-    // Clear dependent fields immediately.
-    setDlid('');
-    setDivision('');
-    setSeasonId('');
-    setLeagueId(newLeague);
+  const handleAddDivision = async (rowId) => {
+    await addDivisionToLeague(create, {
+      seasonId: effectiveSeason,
+      divisionId: rowId,
+      leagueId,
+      pointSystemId: league.point_system,
+    });
   };
 
-  const handleSeasonChange = (e) => {
-    const newSeason = e.target.value;
-    // Clear dependent fields.
-    setDlid('');
-    setDivision('');
-    setSeasonId(newSeason);
+  const handleRemoveDivision = async (rowId) => {
+    await removeDivisionFromLeague(deleteRecord, rowId);
   };
 
-  const handleDivisionChange = (e) => {
-    const newDivision = e.target.value;
-    // Look up the composite record to update dlid.
-    const record = data.find(
-      (item) =>
-        item.league_id === Number(selectedLeague) &&
-        item.season_id === Number(selectedSeason) &&
-        item.division_id === Number(newDivision)
-    );
-    if (record) {
-      setDlid(String(record.id));
+  const handleAddTeam = async (rowId) => {
+    await addTeamToLeague(create, {
+      teamId: rowId,
+      divisionId: effectiveDivision,
+    });
+  };
+
+  const handleRemoveTeam = async (rowId) => {
+    await removeTeamFromLeague(deleteRecord, rowId);
+  };
+
+  function handleTeamSelect(rowId) {
+    // TODO: team selection logic
+    console.log('TODO what will we do here');
+  }
+
+  function handleView(rowId) {
+    // When a division is selected from the table, if composite is in use,
+    // clear it so that changes are local.
+    if (dlid) {
+      setDlid('');
     }
-  };
+    // Set the effective division (and local division state)
+    setEffectiveDivision(rowId);
+    setLocalDivision(rowId);
+    // Toggle view teams.
+    setViewTeams((prev) => !prev);
+  }
 
-  // Early return if data is not loaded or an error occurred.
-  if (!data || isLoading) return null;
-  if (error) return <div>ERROR</div>;
+  if (isLoading) return <Spinner />;
+  if (error) return <p>Error fetching league data</p>;
+  if (!league) return <p>No league found</p>;
+
+  const divisionColumns = tableFields.divisionsColumns.filter(
+    (column) => column.displayNarrow !== false
+  );
+  const teamsColumns = tableFields.teamsColumns.filter(
+    (column) => column.displayNarrow !== false
+  );
+  const filteredDivisions = divisions.filter(
+    (division) => !divisionsLeague.some((dl) => dl.division_id === division.id)
+  );
+  const filteredTeams = teams.filter(
+    (team) => !teamsLeagues.some((dl) => dl.team_id === team.id)
+  );
+  const filteredTeamLeagues = teamsLeagues.filter(
+    (team) => team.league_division_id === effectiveDivision
+  );
 
   return (
-    <nav className={styles.nav}>
-      <ul>
-        <li>
-          <Select
-            label="LEAGUE"
-            name="leagueFilter"
-            options={leagueOptions}
-            placeholder="Select League"
-            onChange={handleLeagueChange}
-            value={selectedLeague}
+    <>
+      <HeaderIndividualPage
+        title={league.name}
+        description={league.description}
+      />
+      <div className="flex-centered-columns">
+        <div className="center-column">
+          {isUpdating ? (
+            <Form
+              fields={tableFields.leaguesColumns.filter(
+                (f) => f.editable !== false
+              )}
+              table="leagues"
+              initialData={league}
+              buttonText="Update"
+            />
+          ) : (
+            <Details
+              label="League"
+              columns="leaguesColumns"
+              data={league}
+              handleChange={() => setIsUpdating((prev) => !prev)}
+            />
+          )}
+          <Table
+            columns={tableFields.seasonsColumns}
+            data={seasons}
+            handleRow={handleSelectSeason}
+            rowsPerPage={3}
+            selected={effectiveSeason}
           />
-        </li>
-        <li>
-          <Select
-            label="SEASON"
-            name="seasonFilter"
-            options={seasonOptions}
-            placeholder="Select Season"
-            onChange={handleSeasonChange}
-            disabled={!selectedLeague}
-            value={selectedSeason}
-          />
-        </li>
-        <li>
-          <Select
-            label="DIVISION"
-            name="divisionFilter"
-            options={divisionOptions}
-            placeholder="Select Division"
-            onChange={handleDivisionChange}
-            disabled={!selectedLeague || !selectedSeason}
-            value={selectedDivision}
-          />
-        </li>
-      </ul>
-    </nav>
+          <AddItemButton table="seasons" label="Add Season" />
+        </div>
+        <div>
+          {viewTeams ? (
+            <>
+              <Table
+                columns={tableFields.teamLeaguesColumns}
+                data={filteredTeamLeagues}
+                handleRow={handleTeamSelect}
+                handleDelete={handleRemoveTeam}
+              />
+              <Button onClick={handleView}>Return To Divisions</Button>
+            </>
+          ) : (
+            <Table
+              columns={tableFields.divisionLeagueColumns}
+              data={divisionsLeague}
+              handleRow={handleView}
+              handleDelete={handleRemoveDivision}
+            />
+          )}
+        </div>
+        <div>
+          {viewTeams ? (
+            <>
+              <Table
+                columns={teamsColumns}
+                data={filteredTeams}
+                handleRow={handleAddTeam}
+              />
+              <AddItemButton table="teams" label="Add Team" />
+            </>
+          ) : (
+            <>
+              <Table
+                columns={divisionColumns}
+                data={filteredDivisions}
+                handleRow={handleAddDivision}
+              />
+              <AddItemButton table="divisions" label="Add Division" />
+            </>
+          )}
+        </div>
+      </div>
+    </>
   );
 }
+
+export default LeagueDetails;
