@@ -1,12 +1,13 @@
 .tableContainer {
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Horizontal centering */
-
-  margin: 0 auto; /* Center the table */
-  width: 100%; /* Responsive width */
-  max-width: 1200px; /* Set a maximum width for the table */
-  padding: 0 1.5rem; /* Reduce side padding */
+  justify-content: center;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 120rem;
+  padding: 0 1.5rem;
+  overflow: auto; /* Ensures scrolling when content overflows */
+  /* max-height: 50vh; Adjust based on your design */
 }
 .addFilterContainer {
   margin: 0 auto;
@@ -40,6 +41,7 @@
 .filterGroup Button:hover {
   background-color: var(--secondary-hover, #d9363e);
 }
+
 .table {
   width: 100%;
   margin: 1.5rem auto; /* Adjust spacing */
@@ -54,12 +56,20 @@
 
 .tableHeader {
   background-color: var(--primary, #333);
+  position: sticky;
+  top: 0;
+  z-index: 2; /* Ensure it stays above other content */
 }
 
 .tableHeader th {
-  padding: 0.8rem 1rem; /* Reduce padding for compactness */
+  padding: 0.8rem 1rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   cursor: pointer;
+  text-align: left;
+}
+.tableHeader th {
+  padding: 0.8rem 1rem; /* Reduce padding for compactness */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   text-align: left;
 }
 

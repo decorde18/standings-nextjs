@@ -1,3 +1,13 @@
+create view for team-game which will include the result, the gdif. it will tie to the tiebreakers and the point system for max min values. if will give the opponent
+
+update standings view to add all values from the teamgameview added together
+
+on new game, the division needs to be added
+
+work on head to head logic
+
+work on multiple teams tied logic
+
 localstorage and query for select on league
 localstorage and query for select on division
 
@@ -7,11 +17,9 @@ then on create form that is in the generic/dynamic page.js redirect to /leagues/
 
 work on games
 
-work on scores
-
-work on standings
-
 // TODO: on add, need to add divisionLeague categories
 // TODO: on add, disable button so can't click 2x
 // TODO: no spinner when adding a game and the DB is delayed
 // TODO: similarly for clicking on links
+// TODO: tables have the sticky logic but inside the divs they need to work to be effective - the tablecontainer needs to have a height
+// TODO: my mysql is not right for games remaining. it included all games, not the ones in the division

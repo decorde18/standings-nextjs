@@ -12,6 +12,8 @@ const Form = ({ fields, table, initialData, redirectPath }) => {
   const { create, update } = useUniversalData({ table });
   const [isLoading, setIsLoading] = useState(false);
   const [formMessage, setFormMessage] = useState(null);
+  const [formData, setFormData] = useState(initialData || {});
+
   const searchParams = useSearchParams();
   const initialValues = Object.fromEntries(searchParams.entries());
   const router = useRouter();
@@ -62,20 +64,29 @@ const Form = ({ fields, table, initialData, redirectPath }) => {
     }
   };
 
+  const handleChange = (e) => {
+    console.log(e.target);
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+  console.log(formData);
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
       {fields
         .filter((field) => field.postDisplay !== false)
         .map((field) => (
           <div key={field.name} className={styles.inputContainer}>
-            {field.selectOptions?.length > 0 ? (
+            {field.type === 'select' ? (
               <Select
-                options={field.selectOptions}
+                options={
+                  field.selectOptions || initialData[field.name].selectOptions
+                }
                 name={field.name}
                 label={field.label}
                 id={field.id}
                 placeholder={field.placeholder}
                 value={initialData ? initialData[field.name] : ''} // Use initialData or empty string
+                disabled={field.disabled}
+                onChange={(e) => handleChange(e)}
               />
             ) : (
               <Input
@@ -86,6 +97,8 @@ const Form = ({ fields, table, initialData, redirectPath }) => {
                 placeholder={field.placeholder}
                 required={field.required}
                 value={initialData ? initialData[field.name] : ''} // Use initialData or empty string
+                disabled={field.disabled}
+                hidden={field.hidden}
               />
             )}
           </div>

@@ -72,9 +72,11 @@ const Table = ({
   };
 
   const handleColumnSelect = (index, column) => {
-    const updatedFilters = [...filters];
-    updatedFilters[index] = { key: column, value: '' };
-    setFilters(updatedFilters);
+    setFilters((prevFilters) => {
+      const updatedFilters = [...prevFilters];
+      updatedFilters[index] = { key: column, value: '' };
+      return updatedFilters;
+    });
   };
 
   const addFilter = () => {
@@ -113,12 +115,22 @@ const Table = ({
               value={filter.key}
               onChange={(e) => handleColumnSelect(index, e.target.value)}
               options={columns
-                .filter((column) => column?.filter !== false)
+                .filter(
+                  (column) =>
+                    column.filter !== false &&
+                    (!filters.some((f) => f.key === column.name) ||
+                      filter.key === column.name) // Ensure already selected column is still available for its own row
+                )
                 .map((column) => ({
                   value: column.name,
                   label: column.label,
                 }))}
+              disabled={
+                filters.length >
+                columns.filter((col) => col.filter !== false).length
+              } // Disable if all available columns are used
             />
+
             <Input
               value={filter.value}
               onChange={(e) => handleFilterChange(index, e.target.value)}
