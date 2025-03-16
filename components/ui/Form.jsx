@@ -8,16 +8,21 @@ import Input from './Input';
 import Select from './Select';
 import { useUniversalData } from '@/hooks/useUniversalData';
 
-const Form = ({ fields, table, initialData, redirectPath }) => {
+const Form = ({
+  fields,
+  table,
+  initialData = {}, // Default to empty object
+  redirectPath,
+  handleSelectChange,
+}) => {
   const { create, update } = useUniversalData({ table });
   const [isLoading, setIsLoading] = useState(false);
   const [formMessage, setFormMessage] = useState(null);
-  const [formData, setFormData] = useState(initialData || {});
 
   const searchParams = useSearchParams();
   const initialValues = Object.fromEntries(searchParams.entries());
   const router = useRouter();
-  // TODO: the params allows for values to be added that aren't needed in the fields ie league_id passed from the league to create the division. if it is not necessary, let's remove
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsLoading(true);
@@ -34,7 +39,7 @@ const Form = ({ fields, table, initialData, redirectPath }) => {
     );
 
     try {
-      if (initialData) {
+      if (Object.keys(initialData).length > 0) {
         // Update existing data
         await update({ table, id: initialData.id, data: filteredData });
         console.log(`${table} updated successfully!`);
@@ -45,11 +50,6 @@ const Form = ({ fields, table, initialData, redirectPath }) => {
         console.log(`${table} created successfully!`);
         setFormMessage('Data created successfully!');
       }
-
-      // Redirect logic
-      // if (redirectPath === 'previous') {
-      //   router.back();
-      // } else
 
       if (redirectPath) {
         router.push(redirectPath);
@@ -63,46 +63,48 @@ const Form = ({ fields, table, initialData, redirectPath }) => {
       setIsLoading(false);
     }
   };
-
-  const handleChange = (e) => {
-    console.log(e.target);
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-  console.log(formData);
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
       {fields
         .filter((field) => field.postDisplay !== false)
-        .map((field) => (
-          <div key={field.name} className={styles.inputContainer}>
-            {field.type === 'select' ? (
-              <Select
-                options={
-                  field.selectOptions || initialData[field.name].selectOptions
-                }
-                name={field.name}
-                label={field.label}
-                id={field.id}
-                placeholder={field.placeholder}
-                value={initialData ? initialData[field.name] : ''} // Use initialData or empty string
-                disabled={field.disabled}
-                onChange={(e) => handleChange(e)}
-              />
-            ) : (
-              <Input
-                id={field.name}
-                name={field.name}
-                label={field.label}
-                type={field.type || 'text'}
-                placeholder={field.placeholder}
-                required={field.required}
-                value={initialData ? initialData[field.name] : ''} // Use initialData or empty string
-                disabled={field.disabled}
-                hidden={field.hidden}
-              />
-            )}
-          </div>
-        ))}
+        .map((field) => {
+          const fieldData =
+            typeof initialData[field.name] === 'object'
+              ? initialData[field.name]
+              : { value: initialData[field.name] } || {}; //
+          return (
+            <div key={field.name} className={styles.inputContainer}>
+              {field.type === 'select' ? (
+                <Select
+                  options={field.selectOptions || fieldData.selectOptions || []} // Handle missing options
+                  name={field.name}
+                  label={field.label}
+                  id={field.id}
+                  placeholder={field.placeholder || 'Select an option'}
+                  value={fieldData.value || ''} // Ensure it doesn't break when empty
+                  disabled={field.disabled}
+                  onChange={
+                    handleSelectChange ||
+                    fieldData.handleSelectChange ||
+                    (() => {})
+                  }
+                />
+              ) : (
+                <Input
+                  id={field.name}
+                  name={field.name}
+                  label={field.label}
+                  type={field.type || 'text'}
+                  placeholder={field.placeholder}
+                  required={field.required}
+                  value={fieldData.value || ''} // Handle empty cases
+                  disabled={field.disabled}
+                  hidden={field.hidden}
+                />
+              )}
+            </div>
+          );
+        })}
       {formMessage && <p>{formMessage}</p>}
       <FormSubmitButton disabled={isLoading} />
     </form>

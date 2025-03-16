@@ -8,10 +8,10 @@ const Select = ({
   value,
   onChange,
   placeholder = 'Please select an option',
+  disabled = false,
   ...props
 }) => {
   id = id || name || `select-${Math.random().toString(36).substr(2, 9)}`;
-  onChange = onChange || (() => {});
 
   return (
     <div className={styles.selectContainer}>
@@ -20,8 +20,9 @@ const Select = ({
         id={id}
         name={name}
         className={styles.select}
-        value={value || ''} // Controlled component
+        value={value ?? ''}
         onChange={onChange}
+        disabled={disabled}
         {...props}
       >
         {placeholder && (
@@ -29,16 +30,24 @@ const Select = ({
             {placeholder}
           </option>
         )}
-        {options.map((option, index) => (
-          <option
-            key={option.value?.toString() || index}
-            value={option.value?.toString() || ''}
-            label={option.label?.toString() || ''}
-            disabled={option.disabled}
-          >
-            {option.name}
-          </option>
-        ))}
+        {options.map((option, index) => {
+          const optionValue =
+            option.value?.toString() ||
+            option.name?.toString() ||
+            index.toString();
+          const optionLabel =
+            option.label?.toString() || option.name?.toString() || optionValue;
+
+          return (
+            <option
+              key={optionValue}
+              value={optionValue}
+              disabled={option.disabled}
+            >
+              {optionLabel}
+            </option>
+          );
+        })}
       </select>
     </div>
   );

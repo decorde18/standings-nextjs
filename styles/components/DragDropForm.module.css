@@ -1,0 +1,71 @@
+.form {
+  width: 100%;
+  max-width: 40rem;
+  margin: 2rem auto;
+  padding: 2rem;
+  border-radius: 0.8rem;
+  background: var(--background, #222);
+  color: var(--text-color, #fff);
+  box-shadow: 0 0.4rem 1rem var(--shadow);
+  border: var(--color-border, #222) solid 1px;
+}
+
+.optionsContainer,
+.selectedContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border, #555);
+  border-radius: 0.5rem;
+  background: var(--background, #333);
+}
+
+/* .optionButton,
+.removeButton,
+.submitButton {
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: var(--color-accent, #007bff);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+.optionButton:hover,
+.removeButton:hover,
+.submitButton:hover {
+  background: var(--color-accent-hover, #0056b3);
+} */
+
+.sortableItem {
+  display: grid;
+  grid-template-columns: 75% 20%; /* Split into two columns, 75% and 25% */
+  gap: 0.5rem; /* Optional: adds space between the buttons */
+  /* padding: 0.75rem; */
+  border: 1px solid var(--color-border, #555);
+  border-radius: 0.5rem;
+  background: var(--background, #444);
+  cursor: grab;
+  width: 100%; /* Ensure it takes full width of the container */
+}
+
+.sortableItem > button:first-child {
+  width: 100%; /* Make the first button fill its 75% grid column */
+}
+
+.sortableItem > button:last-child {
+  width: 100%; /* Make the second button fill its 25% grid column */
+}
+
+.sortableItem:active {
+  cursor: grabbing;
+}
+
+.dragHandle {
+  cursor: grab;
+  padding: 0.5rem;
+  margin-right: 0.5rem;
+  user-select: none; /* Prevent text selection while dragging */
+}

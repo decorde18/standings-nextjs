@@ -23,3 +23,5 @@ work on games
 // TODO: similarly for clicking on links
 // TODO: tables have the sticky logic but inside the divs they need to work to be effective - the tablecontainer needs to have a height
 // TODO: my mysql is not right for games remaining. it included all games, not the ones in the division
+// TODO: on leagueData, if i change hte season, the selectedDivision should reset and it should go back to the list of divisiosn
+on selectedDivision, I need a point system / tie breaker option

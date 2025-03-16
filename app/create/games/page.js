@@ -4,10 +4,15 @@ import Form from '@/components/ui/Form';
 import { useUniversalData } from '@/hooks/useUniversalData';
 import { gamesColumns } from '@/lib/tables';
 import { useSearchParams } from 'next/navigation';
+import { useState } from 'react';
 
 function CreateGamePage({ params }) {
   const searchParams = useSearchParams();
   const dlid = searchParams.get('dlid');
+  const [teamValues, setTeamValues] = useState({
+    home_team_id: '',
+    away_team_id: '',
+  });
 
   const {
     data: teams,
@@ -25,7 +30,9 @@ function CreateGamePage({ params }) {
   const fields = gamesColumns.filter((field) => field.editable !== false);
 
   const updatedFields = [...fields];
-
+  function handleChange(e) {
+    setTeamValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  }
   if (isLoading || isLoadingTeams) return null;
   if (error || errorTeams) return <Error error={error} />;
 
@@ -45,12 +52,20 @@ function CreateGamePage({ params }) {
           initialData={{
             division_id: dlid,
             home_team_id: {
-              handleChange: (e) => e.target.value,
-              selectOptions: teamArray,
+              value: teamValues.home_team_id,
+              handleSelectChange: handleChange,
+              selectOptions: [
+                // { name: 'Select a Team', value: '', disabled: true },
+                ...teamArray,
+              ],
             },
             away_team_id: {
-              handleChange: (e) => e.target.value,
-              selectOptions: teamArray,
+              value: teamValues.away_team_id,
+              handleSelectChange: handleChange,
+              selectOptions: [
+                // { name: 'Select a Team', value: '', disabled: true },
+                ...teamArray,
+              ],
             },
           }}
           buttonText="Save"
