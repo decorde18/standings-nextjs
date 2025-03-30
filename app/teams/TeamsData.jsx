@@ -4,7 +4,6 @@ import Spinner from '@/components/ui/Spinner';
 
 import { teamsColumns } from '@/lib/tables';
 import { useUniversalData } from '@/hooks/useUniversalData';
-import { Suspense } from 'react';
 
 export function TeamsData() {
   const {

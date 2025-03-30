@@ -1,27 +1,43 @@
-create view for team-game which will include the result, the gdif. it will tie to the tiebreakers and the point system for max min values. if will give the opponent
+gdif is wrong (GA is wrong) - the max is what is wrng
 
-update standings view to add all values from the teamgameview added together
+on division page
+// TODO: need a way to not display the tiebreakers component if there are none
 
-on new game, the division needs to be added
+-on division select, change unique in mysql- division_league is all messed up- foreign key fields seemed to have deleted
+
+- on division deselected, remove selected division
+- when page loads, the divisions are not showing until you click on the season even though the season is selected (see whether effective season, division is necessary)
 
 work on head to head logic
 
 work on multiple teams tied logic
 
-localstorage and query for select on league
-localstorage and query for select on division
-
-then on create form that is in the generic/dynamic page.js redirect to /leagues/id where the id is from the localstorage
-
-- in tables.js --- if display is false, it will not show in table. if editable is false, it will not show in create/modify --- go through the create and be sure this is corret
-
-work on games
-
-// TODO: on add, need to add divisionLeague categories
-// TODO: on add, disable button so can't click 2x
 // TODO: no spinner when adding a game and the DB is delayed
+// TODO: on add, disable button so can't click 2x
 // TODO: similarly for clicking on links
+
 // TODO: tables have the sticky logic but inside the divs they need to work to be effective - the tablecontainer needs to have a height
-// TODO: my mysql is not right for games remaining. it included all games, not the ones in the division
-// TODO: on leagueData, if i change hte season, the selectedDivision should reset and it should go back to the list of divisiosn
-on selectedDivision, I need a point system / tie breaker option
+
+fix header on not wide screens
+fix login component on all screens (not visible on wide not styled on narrow)
+
+FEWEST GOALS
+MOST GOALS
+ON TIE BREAKERS PAGE
+LOAD null when no divisoin tie breakers
+
+- add min max
+- add ability for multiple of the same ie one with min max the other without
+
+add ability to default divisions for season
+add ability to default tiebreaker for divisions
+
+GAMES;
+-edit and delete
+---ADD no showing teams
+
+on Schedules, auto filter for dlid. add column for division and remove filter so all games with divisions are visible
+
+ON FORM- make the Data is being created look good
+
+ADD SEASON- redirect needs to go to league - dosn't seem to add either (add season needs to add to league seasons not just season)

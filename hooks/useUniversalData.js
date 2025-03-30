@@ -10,7 +10,7 @@ export async function fetchData(table, filter = {}, sort, search) {
     // Construct query parameters for filtering, sorting, and searching
     const queryParams = new URLSearchParams();
     Object.entries(filter).forEach(([key, value]) =>
-      queryParams.append(key, value)
+      queryParams.append(key, value),
     );
     if (sort) queryParams.append('sort', sort);
     if (search) queryParams.append('search', search);
@@ -20,10 +20,10 @@ export async function fetchData(table, filter = {}, sort, search) {
     }
   }
 
-  console.log('Fetching URL:', url);
+  // console.log('Fetching URL:', url);
 
   const response = await fetch(url);
-  console.log('Response status:', response.status);
+  // console.log('Response status:', response.status);
 
   if (!response.ok) {
     throw new Error(`Failed to fetch ${table}, Status: ${response.status}`);

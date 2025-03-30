@@ -28,10 +28,12 @@ export default function RootLayout({ children }) {
       >
         <Providers>
           <Header />
+
           <main className={styles.mainContainer}>{children}</main>
           <footer className={styles.footer}>
             <p>
-              &copy; {new Date().getFullYear()} David Cordero de Jesus Soccer
+              &copy; {new Date().getFullYear()}{' '}
+              <span lang="en">David Cordero de Jesus Soccer</span>
             </p>
           </footer>
         </Providers>

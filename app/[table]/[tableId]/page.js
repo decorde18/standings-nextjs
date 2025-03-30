@@ -16,7 +16,7 @@ function RecordEdit({ params }) {
   const { tableId, table } = use(params); // Accessing params correctly now
 
   const fields = tableFields[`${table}Columns`].filter(
-    (field) => field.editable !== false
+    (field) => field.editable !== false,
   );
 
   const { isLoading, error, data } = useUniversalData({
@@ -28,7 +28,7 @@ function RecordEdit({ params }) {
   const [isUpdating, setIsUpdating] = useState(false);
 
   if (isLoading) return <Spinner />;
-  if (error) return <p>Error fetching league data</p>;
+  if (error) return <p>Error fetching data</p>;
 
   if (!record) return <p>No record found</p>;
 

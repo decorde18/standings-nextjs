@@ -1,24 +1,40 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+
+import { useLeagueDetailsData } from '@/hooks/useLeagueDetails';
+
 import Table from '@/components/Table';
 import Spinner from '@/components/ui/Spinner';
+
 import { leaguesColumns } from '@/lib/tables';
-import { useUniversalData } from '@/hooks/useUniversalData';
 
 export function LeaguesData() {
-  const {
-    data: leagues,
-    isLoading,
-    error,
-  } = useUniversalData({ table: 'leagues' });
+  const router = useRouter();
+  const { isLoading, error, leagues } = useLeagueDetailsData();
+
+  function selectLeague(leagueId) {
+    router.push(`/leagues/${leagueId}`);
+  }
 
   if (isLoading) return <Spinner />;
-  if (error) return <p className="text-red-500">Error loading data</p>;
+  if (error)
+    return (
+      <Error
+        error={error}
+        name="Leagues"
+        message="There is an issue with the Leagues Data"
+      />
+    );
 
   return (
     <div className="flex-centered-columns">
       <div className="center-column">
-        <Table columns={leaguesColumns} data={leagues || []} />
+        <Table
+          columns={leaguesColumns}
+          data={leagues || []}
+          handleRow={selectLeague}
+        />
       </div>
     </div>
   );

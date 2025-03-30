@@ -4,19 +4,27 @@ import Spinner from '@/components/ui/Spinner';
 import { Suspense } from 'react';
 import GameRows from './GameRows';
 import AddItemButton from '@/components/ui/AddItemButton';
+import GameRowsScores from './GameRowsScores';
 
-function Games({ href }) {
+async function Games({ href, searchParams }) {
+  const params = Object.entries(await searchParams)
+    .map(([key, value]) => `${key}=${value}`)
+    .join('&');
+  // TODO: how will we go about switching from schedule to scores
   return (
     <div>
       <HeaderIndividualPage href={href} />
       <Suspense fallback={<Spinner />}>
-        <GameRows />
-        <AddItemButton table="games" label="Add Game" />
+        {/* <GameRows /> */}
+        <GameRowsScores />
+        <AddItemButton
+          table="games"
+          label="Add Game"
+          redirectPath={`/games?${params}`}
+        />
       </Suspense>
     </div>
   );
 }
 
 export default Games;
-
-

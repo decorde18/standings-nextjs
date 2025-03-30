@@ -1,7 +1,7 @@
 import Spinner from '@/components/ui/Spinner';
 
 function loading() {
-  return <Spinner></Spinner>;
+  return <Spinner />;
 }
 
 export default loading;

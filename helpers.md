@@ -70,3 +70,13 @@ value,
 onChange,
 placeholder = 'Please select an option',
 ...props
+})
+
+--RANKING
+rankTeams(teams, config) config =
+// - tiebreakers: array of objects like { category_key
+: "goalDifference", priority: 1 sortDirection:'descending'}.
+// - tiebreakerStyle: "exhaustive" or "dynamic".
+// - headToHeadResults: an object mapping team names to opponents and wins.
+// - headToHeadStyle: "exhaustive" or "dynamic" (for future extension).
+// - headToHeadSkipForMultiple: if true (1), skip head-to-head if more than 2 teams are tied.

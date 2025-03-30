@@ -4,7 +4,7 @@ import styles from '@/styles/components/Details.module.css';
 
 function Details({ handleChange, data, label, columns }) {
   const displayFields = table[columns].filter(
-    (field) => field.display !== false
+    (field) => field.display !== false,
   );
 
   return (

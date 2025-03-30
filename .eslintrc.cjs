@@ -9,6 +9,7 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
     'plugin:@typescript-eslint/recommended',
+    'plugin:@next/next/recommended',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -25,5 +26,6 @@ module.exports = {
     'no-console': 'warn', // Optional: Disables the console.log rule
     'react/jsx-uses-react': 'off', // In case you're using React 17 JSX Transform
     'react/react-in-jsx-scope': 'off', // In case you're using React 17 JSX Transform
+    'no-undef': 'error',
   },
 };

@@ -1,14 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { use } from 'react';
+import { useState, useEffect, use } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+
 import { useLeagueDetailsData } from '@/hooks/useLeagueDetails';
-import {
-  useSeasonId,
-  useDivisionLeagueId,
-  useQueryParam,
-} from '@/hooks/useQueryParams';
-// import { useDivisionLeagueId } from '@/hooks/useDivisionLeagueId';
+import { useFilter } from '@/providers/FilterProvider';
 
 import {
   addDivisionToLeague,
@@ -16,131 +12,147 @@ import {
   removeDivisionFromLeague,
   removeTeamFromLeague,
 } from '@/lib/leagueActions';
+
 import * as tableFields from '@/lib/tables';
 
-import Form from '@/components/ui/Form';
 import Spinner from '@/components/ui/Spinner';
-import Details from '@/components/ui/Details';
-import Table from '@/components/Table';
-import HeaderIndividualPage from '@/components/HeaderIndividualPage';
+
 import AddItemButton from '@/components/ui/AddItemButton';
 import Button from '@/components/ui/Button';
-import { useSearchParams } from 'next/navigation';
+import Table from '@/components/Table';
+import HeaderIndividualPage from '@/components/HeaderIndividualPage';
+import UpdateLeague from './UpdateLeague';
+import SeasonSelector from './SeasonSelector';
+import TieBreakers from './TieBreakers';
+import Error from '@/app/error';
+import Empty from '@/app/empty';
+import PointSystemSelector from './PointSystemSelector';
 
 function LeagueDetails({ params }) {
-  // Get leagueId from params (wrapped in use())
-  const { leagueId } = use(params);
+  const router = useRouter();
 
+  const leagueId = use(params).leagueId;
   const searchParams = useSearchParams();
-  // const dlid = searchParams.get('dlid');
-  const seasonid = searchParams.get('season_id');
-  // Use the separate season hook as fallback.
-  const { value: seasonId, setValue: setSeasonId } = useSeasonId();
 
-  const { value: dlid, setValue: setDlid } = useQueryParam('dlid');
-  // const { dlid, setDlid } = useDivisionLeagueId();
-  // TODO: go through evaluate dlid and possibly change dlid back to params and then new logic for updating dlid
-  // Local state to hold effective values.
+  const {
+    league: filteredLeague,
+    setLeague,
+    season,
+    setSeason,
+    division,
+    setDivision,
+    dlid,
+    setDlid,
+  } = useFilter();
+
   const [effectiveSeason, setEffectiveSeason] = useState('');
   const [effectiveDivision, setEffectiveDivision] = useState('');
-  const [localDivision, setLocalDivision] = useState(''); // separate from composite
+  const [localDivision, setLocalDivision] = useState('');
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [viewTeams, setViewTeams] = useState(false);
+  const [viewTieBreakers, setViewTieBreakers] = useState(false);
 
   const {
     isLoading,
     error,
     league,
     divisions,
-    divisionsLeague, // array of records linking league/division/season
+    divisionsLeague,
     seasons,
     teams,
     teamsLeagues,
     create,
+    update,
     deleteRecord,
   } = useLeagueDetailsData(leagueId, effectiveSeason, effectiveDivision);
-  // Other local state for UI:
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [viewTeams, setViewTeams] = useState(false);
 
+  //if no league searchparams, set it
   useEffect(() => {
-    // We'll derive effectiveSeason and effectiveDivision from dlid if available,
-    // otherwise we use seasonId and a local division state.
-    if (!divisionsLeague || !divisionsLeague.length) return;
+    if (!filteredLeague) setLeague(leagueId);
+  }, [filteredLeague, leagueId, setLeague]);
 
-    const season = dlid
-      ? divisionsLeague.find((div) => div.id === +dlid)?.season_id
-      : seasonid;
-    if (!season) return;
-    setEffectiveSeason(season);
-  }, [divisionsLeague, dlid, seasonid]);
+  // useEffect(() => {
+  //   if (!divisionsLeague?.length) return;
+  //   const season = divisionsLeague.find((div) => div.id === +dlid);
+  //   setEffectiveSeason(season?.season_id || seasonIdParam);
+  //   if (season) setDlid(season);
+  // }, [divisionsLeague, dlid, setDlid]);
 
-  function handleSelectSeason(rowId) {
-    // If there's a composite selection, clear it.
-    if (dlid) {
-      setDlid('');
-    }
-    setSeasonId(rowId); // This updates the separate season query param.
-  }
-
-  const handleAddDivision = async (rowId) => {
+  async function handleAddDivision(rowId) {
+    console.log('div', rowId, 'season', season, 'league', leagueId);
     await addDivisionToLeague(create, {
-      seasonId: effectiveSeason,
+      seasonId: season,
       divisionId: rowId,
       leagueId,
       pointSystemId: league.point_system,
     });
-  };
+  }
 
-  const handleRemoveDivision = async (rowId) => {
+  async function handleRemoveDivision(rowId) {
     await removeDivisionFromLeague(deleteRecord, rowId);
-  };
+  }
 
-  const handleAddTeam = async (rowId) => {
+  async function handleAddTeam(rowId) {
     await addTeamToLeague(create, {
       teamId: rowId,
       divisionId: effectiveDivision,
     });
-  };
+  }
 
-  const handleRemoveTeam = async (rowId) => {
+  async function handleRemoveTeam(rowId) {
     await removeTeamFromLeague(deleteRecord, rowId);
-  };
-
-  function handleTeamSelect(rowId) {
-    // TODO: team selection logic
-    console.log('TODO what will we do here');
   }
 
   function handleView(rowId) {
-    // When a division is selected from the table, if composite is in use,
-    // clear it so that changes are local.
-    if (dlid) {
-      setDlid('');
-    }
-    // Set the effective division (and local division state)
+    if (dlid) setDlid('');
+    setDivision(rowId);
     setEffectiveDivision(rowId);
     setLocalDivision(rowId);
-    // Toggle view teams.
     setViewTeams((prev) => !prev);
+  }
+  function handleViewTieBreakers() {
+    setViewTieBreakers((prev) => !prev);
   }
 
   if (isLoading) return <Spinner />;
-  if (error) return <p>Error fetching league data</p>;
-  if (!league) return <p>No league found</p>;
+  if (error)
+    return (
+      <Error
+        error={error}
+        name="League Error"
+        message="There is an issue with the League"
+      />
+    );
+  if (!league)
+    return <Empty name="No League Data" message="There is no League" />;
+
+  const filteredSeasons = seasons.filter((item) =>
+    divisionsLeague.map((item) => item.season_id).includes(item.id),
+  );
 
   const divisionColumns = tableFields.divisionsColumns.filter(
-    (column) => column.displayNarrow !== false
+    (column) => column.displayNarrow !== false,
   );
   const teamsColumns = tableFields.teamsColumns.filter(
-    (column) => column.displayNarrow !== false
+    (column) => column.displayNarrow !== false,
   );
   const filteredDivisions = divisions.filter(
-    (division) => !divisionsLeague.some((dl) => dl.division_id === division.id)
+    (division) =>
+      !divisionsLeague.some(
+        (dl) => dl.division_id == division.id && dl.season_id == season,
+      ),
   );
   const filteredTeams = teams.filter(
-    (team) => !teamsLeagues.some((dl) => dl.team_id === team.id)
+    (team) => !teamsLeagues.some((dl) => dl.team_id === team.id),
   );
   const filteredTeamLeagues = teamsLeagues.filter(
-    (team) => team.league_division_id === effectiveDivision
+    (team) => team.league_division_id === effectiveDivision,
+  );
+  const filteredDivisionLeagues = divisionsLeague.filter(
+    (div) => div.season_id == season,
+  );
+  const [filteredDivisionLeague] = filteredDivisionLeagues.filter(
+    (div) => div.division_id == division,
   );
 
   return (
@@ -149,76 +161,85 @@ function LeagueDetails({ params }) {
         title={league.name}
         description={league.description}
       />
-      <div className="flex-centered-columns">
-        <div className="center-column">
-          {isUpdating ? (
-            <Form
-              fields={tableFields.leaguesColumns.filter(
-                (f) => f.editable !== false
-              )}
-              table="leagues"
-              initialData={league}
-              buttonText="Update"
+      {
+        <div className="flex-centered-columns">
+          <div className="center-column">
+            <UpdateLeague
+              isUpdating={isUpdating}
+              setIsUpdating={setIsUpdating}
+              league={league}
+              tableFields={tableFields}
+              redirectPath={window.location.href}
             />
-          ) : (
-            <Details
-              label="League"
-              columns="leaguesColumns"
-              data={league}
-              handleChange={() => setIsUpdating((prev) => !prev)}
+            <SeasonSelector
+              isUpdating={isUpdating}
+              tableFields={tableFields}
+              seasons={filteredSeasons}
+              setSeason={setSeason}
+              effectiveSeason={season}
             />
-          )}
-          <Table
-            columns={tableFields.seasonsColumns}
-            data={seasons}
-            handleRow={handleSelectSeason}
-            rowsPerPage={3}
-            selected={effectiveSeason}
-          />
-          <AddItemButton table="seasons" label="Add Season" />
-        </div>
-        <div>
-          {viewTeams ? (
+          </div>
+          {season && (
             <>
-              <Table
-                columns={tableFields.teamLeaguesColumns}
-                data={filteredTeamLeagues}
-                handleRow={handleTeamSelect}
-                handleDelete={handleRemoveTeam}
-              />
-              <Button onClick={handleView}>Return To Divisions</Button>
+              <div>
+                {viewTieBreakers ? (
+                  <PointSystemSelector
+                    tableFields={tableFields}
+                    dlid={filteredDivisionLeague}
+                    update={update}
+                  />
+                ) : viewTeams ? (
+                  <>
+                    <Table
+                      columns={tableFields.teamLeaguesColumns}
+                      data={filteredTeamLeagues}
+                      handleDelete={handleRemoveTeam}
+                    />
+                    <Button onClick={handleView}>Return To Divisions</Button>
+                  </>
+                ) : (
+                  <>
+                    <Table
+                      columns={tableFields.divisionLeagueColumns}
+                      data={filteredDivisionLeagues}
+                      handleRow={handleView}
+                      handleDelete={handleRemoveDivision}
+                    />
+                  </>
+                )}
+                <Button onClick={handleViewTieBreakers}>
+                  {!viewTieBreakers
+                    ? 'View/Edit Tie Breakers'
+                    : 'Return to Divisions'}
+                </Button>
+              </div>
+              <div>
+                {viewTieBreakers ? (
+                  <TieBreakers />
+                ) : season && viewTeams ? (
+                  <>
+                    <Table
+                      columns={teamsColumns}
+                      data={filteredTeams}
+                      handleRow={handleAddTeam}
+                    />
+                    <AddItemButton table="teams" label="Add Team" />
+                  </>
+                ) : (
+                  <>
+                    <Table
+                      columns={divisionColumns}
+                      data={filteredDivisions}
+                      handleRow={handleAddDivision}
+                    />
+                    <AddItemButton table="divisions" label="Add Division" />
+                  </>
+                )}
+              </div>
             </>
-          ) : (
-            <Table
-              columns={tableFields.divisionLeagueColumns}
-              data={divisionsLeague}
-              handleRow={handleView}
-              handleDelete={handleRemoveDivision}
-            />
           )}
         </div>
-        <div>
-          {viewTeams ? (
-            <>
-              <Table
-                columns={teamsColumns}
-                data={filteredTeams}
-                handleRow={handleAddTeam}
-              />
-              <AddItemButton table="teams" label="Add Team" />
-            </>
-          ) : (
-            <>
-              <Table
-                columns={divisionColumns}
-                data={filteredDivisions}
-                handleRow={handleAddDivision}
-              />
-              <AddItemButton table="divisions" label="Add Division" />
-            </>
-          )}
-        </div>
-      </div>
+      }
     </>
   );
 }

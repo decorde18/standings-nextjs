@@ -1,125 +1,107 @@
 'use client';
 
 import styles from '@/styles/components/FilterBar.module.css';
-
 import { useUniversalData } from '@/hooks/useUniversalData';
 import { useEffect, useState } from 'react';
-import {
-  useDivisionLeagueId,
-  useSeasonId,
-  useLeague,
-  useDivision,
-} from '@/hooks/useQueryParams';
 import Select from '@/components/ui/Select';
+import { useFilter } from '@/providers/FilterProvider';
 
 export default function FilterBar() {
-  const [leagueOptions, setLeagueOptions] = useState([]);
-  const [seasonOptions, setSeasonOptions] = useState([]);
-  const [divisionOptions, setDivisionOptions] = useState([]);
+  const {
+    league,
+    setLeague,
+    season,
+    setSeason,
+    division,
+    setDivision,
 
-  const { value: dlid, setValue: setDlid } = useDivisionLeagueId();
-  const { value: selectedDivision, setValue: setDivision } = useDivision();
-  const { value: selectedSeason, setValue: setSeasonId } = useSeasonId();
-  const { value: selectedLeague, setValue: setLeagueId } = useLeague();
-
+    setDlid,
+  } = useFilter();
   const { isLoading, error, data } = useUniversalData({
     table: 'divisions_leagues',
   });
 
-  useEffect(() => {
-    if (data && Array.isArray(data) && dlid) {
-      const record = data.find((item) => String(item.id) === dlid);
-      if (record) {
-        setLeagueId(record.league_id);
-        setSeasonId(record.season_id);
-        setDivision(record.division_id);
-      } else {
-        setDivision('');
-        setDlid('');
-      }
-    }
-  }, [data, dlid]);
+  const [leagueOptions, setLeagueOptions] = useState([]);
+  const [seasonOptions, setSeasonOptions] = useState([]);
+  const [divisionOptions, setDivisionOptions] = useState([]);
 
   useEffect(() => {
     if (!data || !Array.isArray(data)) return;
-    const opts = Array.from(
-      new Map(data.map((item) => [item.league_id, item])).values()
-    ).map((item) => ({ value: item.league_id, name: item.league_name }));
-    setLeagueOptions(opts);
+    const uniqueLeagues = [
+      ...new Map(data.map((item) => [item.league_id, item])).values(),
+    ];
+    setLeagueOptions(
+      uniqueLeagues.map((item) => ({
+        value: item.league_id,
+        name: item.league_name,
+      }))
+    );
   }, [data]);
 
   useEffect(() => {
-    if (!data || !Array.isArray(data) || !selectedLeague) {
+    if (!data || !league) {
       setSeasonOptions([]);
       return;
     }
-    const filtered = data.filter(
-      (item) => item.league_id === Number(selectedLeague)
+    const filtered = data.filter((item) => item.league_id === Number(league));
+    const uniqueSeasons = [
+      ...new Map(filtered.map((item) => [item.season_id, item])).values(),
+    ];
+    setSeasonOptions(
+      uniqueSeasons.map((item) => ({
+        value: item.season_id,
+        name: `${item.season} ${item.year}`,
+      }))
     );
-    const opts = Array.from(
-      new Map(filtered.map((item) => [item.season_id, item])).values()
-    ).map((item) => ({
-      value: item.season_id,
-      name: `${item.season} ${item.year}`,
-    }));
-    setSeasonOptions(opts);
-  }, [data, selectedLeague]);
+  }, [data, league]);
 
   useEffect(() => {
-    if (!data || !Array.isArray(data) || !selectedLeague || !selectedSeason) {
+    if (!data || !league || !season) {
       setDivisionOptions([]);
       return;
     }
     const filtered = data.filter(
       (item) =>
-        item.league_id === Number(selectedLeague) &&
-        item.season_id === Number(selectedSeason)
+        item.league_id === Number(league) && item.season_id === Number(season)
     );
-    const opts = Array.from(
-      new Map(filtered.map((item) => [item.division_id, item])).values()
-    ).map((item) => ({
-      value: item.division_id,
-      name: `D${item.level} ${item.division_name} ${
-        item.gender === 'F'
-          ? 'Women'
-          : item.gender === 'M'
-          ? 'Men'
-          : item.gender
-      }`,
-    }));
-    setDivisionOptions(opts);
-  }, [data, selectedLeague, selectedSeason]);
+    const uniqueDivisions = [
+      ...new Map(filtered.map((item) => [item.division_id, item])).values(),
+    ];
+    setDivisionOptions(
+      uniqueDivisions.map((item) => ({
+        value: item.division_id,
+        name: `D${item.level} ${item.division_name} ${
+          item.gender === 'F' ? 'Women' : 'Men'
+        }`,
+      }))
+    );
+  }, [data, league, season]);
 
-  const handleLeagueChange = (e) => {
-    const newLeague = e.target.value;
-    setDlid('');
-    setDivision('');
-    setSeasonId('');
-    setLeagueId(newLeague);
-  };
-
-  const handleSeasonChange = (e) => {
-    const newSeason = e.target.value;
-    setDlid('');
-    setDivision('');
-    setSeasonId(newSeason);
-  };
-
+  const handleLeagueChange = (e) => setLeague(e.target.value);
+  const handleSeasonChange = (e) => setSeason(e.target.value);
   const handleDivisionChange = (e) => {
     const newDivision = e.target.value;
     const record = data.find(
       (item) =>
-        item.league_id === Number(selectedLeague) &&
-        item.season_id === Number(selectedSeason) &&
+        item.league_id === Number(league) &&
+        item.season_id === Number(season) &&
         item.division_id === Number(newDivision)
     );
     if (record) {
       setDlid(String(record.id));
+      setDivision(newDivision);
     }
   };
 
-  if (!data || isLoading) return null;
-  if (error) return <div>ERROR</div>;
+  if (isLoading) return null;
+  if (error)
+    return (
+      <Error
+        error={error}
+        name="Filter Error"
+        message="There is an issue with the Filter"
+      />
+    );
 
   return (
     <nav className={styles.nav}>
@@ -127,33 +109,27 @@ export default function FilterBar() {
         <li>
           <Select
             label="LEAGUE"
-            name="leagueFilter"
             options={leagueOptions}
-            placeholder="Select League"
             onChange={handleLeagueChange}
-            value={selectedLeague}
+            value={league}
           />
         </li>
         <li>
           <Select
             label="SEASON"
-            name="seasonFilter"
             options={seasonOptions}
-            placeholder="Select Season"
             onChange={handleSeasonChange}
-            disabled={!selectedLeague}
-            value={selectedSeason}
+            disabled={!league}
+            value={season}
           />
         </li>
         <li>
           <Select
             label="DIVISION"
-            name="divisionFilter"
             options={divisionOptions}
-            placeholder="Select Division"
             onChange={handleDivisionChange}
-            disabled={!selectedLeague || !selectedSeason}
-            value={selectedDivision}
+            disabled={!league || !season}
+            value={division}
           />
         </li>
       </ul>

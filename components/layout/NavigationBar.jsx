@@ -9,9 +9,12 @@ import styles from '@/styles/components/NavigationBar.module.css';
 import { routes } from '@/lib/routes';
 import NavLink from './NavLink';
 import FilterBar from './FilterBar';
+import { useSearchParams } from 'next/navigation';
 
 export default function NavigationBar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const searchParams = useSearchParams();
+  const queryString = new URLSearchParams(searchParams).toString(); // Convert queryParams to string
 
   return (
     <>
@@ -39,7 +42,9 @@ export default function NavigationBar() {
           <ul>
             {routes.map((page) => (
               <li key={page.href} className={styles.navItem}>
-                <NavLink href={page.href}>{page.title}</NavLink>
+                <NavLink href={`${page.href}?${queryString}`}>
+                  {page.title}
+                </NavLink>
               </li>
             ))}
           </ul>

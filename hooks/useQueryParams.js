@@ -54,3 +54,6 @@ export function useLeague() {
 export function useDivision() {
   return useQueryParam('division');
 }
+export function useDlid() {
+  return useQueryParam('dlid');
+}

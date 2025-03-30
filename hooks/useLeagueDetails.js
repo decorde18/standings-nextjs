@@ -7,10 +7,11 @@ export function useLeagueDetailsData(leagueId, seasonId, divisionId) {
     data: leaguesData,
     error: leaguesError,
     create,
+    update,
     delete: deleteRecord,
   } = useUniversalData({
     table: 'leagues',
-    filter: { id: leagueId },
+    filter: { ...(leagueId && { id: leagueId }) },
   });
   const { data: divisionsLeagueData, error: divisionsLeagueError } =
     useUniversalData({
@@ -32,7 +33,7 @@ export function useLeagueDetailsData(leagueId, seasonId, divisionId) {
   const { data: teamsLeaguesData, error: teamsLeaguesError } = useUniversalData(
     {
       table: 'team_leagues',
-    }
+    },
   );
 
   // ✅ Track loading state manually
@@ -60,7 +61,7 @@ export function useLeagueDetailsData(leagueId, seasonId, divisionId) {
 
   return {
     league: leaguesData?.[0] || null, // Get the first item or null
-    leagues: leaguesData || null, // Get the first item or null
+    leagues: leaguesData,
     divisionsLeague: divisionsLeagueData || [],
     divisions: divisionsData || [],
     seasons: seasonsData || [],
@@ -68,6 +69,7 @@ export function useLeagueDetailsData(leagueId, seasonId, divisionId) {
     teamsLeagues: teamsLeaguesData || [],
     isLoading,
     create,
+    update,
     deleteRecord,
     error:
       leaguesError ||
