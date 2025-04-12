@@ -8,8 +8,6 @@ on division page
 - on division deselected, remove selected division
 - when page loads, the divisions are not showing until you click on the season even though the season is selected (see whether effective season, division is necessary)
 
-work on head to head logic
-
 work on multiple teams tied logic
 
 // TODO: no spinner when adding a game and the DB is delayed

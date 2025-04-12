@@ -1,4 +1,5 @@
 'use client';
+
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { DndContext, closestCenter } from '@dnd-kit/core';
@@ -17,9 +18,11 @@ const DragDropForm = ({
   initialSelected,
   create,
   update,
+  deleteItem,
   table,
   initialData = {},
   redirectPath,
+  dlid,
 }) => {
   const [availableOptions, setAvailableOptions] = useState([]);
   const [selectedOptions, setSelectedOptions] = useState([]);
@@ -30,20 +33,37 @@ const DragDropForm = ({
 
   useEffect(() => {
     setAvailableOptions(
-      options.filter((opt) => !initialSelected.find((sel) => sel.id === opt.id))
+      options.filter(
+        (opt) =>
+          !initialSelected.find((sel) => sel.category_id === opt.category_id),
+      ),
     );
     setSelectedOptions(initialSelected);
     setMounted(true);
   }, [options, initialSelected]);
 
   const handleSelect = (option) => {
-    setAvailableOptions((prev) => prev.filter((opt) => opt.id !== option.id));
-    setSelectedOptions((prev) => [...prev, option]);
+    setAvailableOptions((prev) =>
+      prev.filter((opt) => opt.category_id !== option.category_id),
+    );
+    setSelectedOptions((prev) => [
+      ...prev,
+      { ...option, priority: prev.length },
+    ]);
   };
 
   const handleRemove = (option) => {
-    setSelectedOptions((prev) => prev.filter((opt) => opt.id !== option.id));
-    setAvailableOptions((prev) => [...prev, option]);
+    const removeItem = selectedOptions.find(
+      (item) => item.name === option,
+    ).category_id;
+
+    setSelectedOptions((prev) =>
+      prev.filter((opt) => opt.category_id !== removeItem),
+    );
+    setAvailableOptions((prev) => [
+      ...prev,
+      selectedOptions.find((opt) => opt.category_id === removeItem),
+    ]);
   };
 
   const handleDragEnd = (event) => {
@@ -51,11 +71,20 @@ const DragDropForm = ({
     if (!over || active.id === over.id) return;
 
     const activeIndex = selectedOptions.findIndex(
-      (opt) => opt.id === active.id
+      (opt) => opt.category_id === active.id,
     );
-    const overIndex = selectedOptions.findIndex((opt) => opt.id === over.id);
+    const overIndex = selectedOptions.findIndex(
+      (opt) => opt.category_id === over.id,
+    );
 
-    setSelectedOptions((prev) => arrayMove(prev, activeIndex, overIndex));
+    const newOrder = arrayMove(selectedOptions, activeIndex, overIndex).map(
+      (opt, index) => ({
+        ...opt,
+        priority: index,
+      }),
+    );
+
+    setSelectedOptions(newOrder);
   };
 
   const handleSubmit = async (event) => {
@@ -63,24 +92,45 @@ const DragDropForm = ({
     setIsLoading(true);
     setFormMessage(null);
 
-    const selectedIds = selectedOptions.map((opt) => opt.id);
-
+    const toCreate = selectedOptions.filter((opt) => !opt.tiebreaker_id);
+    const toUpdate = selectedOptions.filter((opt) => opt.tiebreaker_id);
+    const toDelete = availableOptions.filter((opt) => opt.category_id);
     try {
-      if (Object.keys(initialData).length > 0) {
-        await update({ table, id: initialData.id, data: { selectedIds } });
-        console.log(`${table} updated successfully!`);
-        setFormMessage('Data updated successfully!');
-      } else {
-        await create({ table, data: { selectedIds } });
-        console.log(`${table} created successfully!`);
-        setFormMessage('Data created successfully!');
+      if (toUpdate.length > 0) {
+        await Promise.all(
+          toUpdate.map((opt) =>
+            update({
+              table,
+              id: opt.tiebreaker_id,
+              data: { priority: opt.priority },
+            }),
+          ),
+        );
       }
 
-      if (redirectPath) {
-        router.push(redirectPath);
-      } else {
-        router.push(`/${table}`);
+      if (toCreate.length > 0) {
+        await Promise.all(
+          toCreate.map((opt) =>
+            create({
+              table,
+              data: {
+                category_id: opt.category_id,
+                priority: opt.priority,
+                division_id: dlid,
+              },
+            }),
+          ),
+        );
       }
+
+      if (toDelete.length > 0) {
+        await Promise.all(
+          toDelete.map((opt) => deleteItem({ table, id: opt.tiebreaker_id })),
+        );
+      }
+
+      setFormMessage('Changes saved successfully!');
+      if (redirectPath) router.push(redirectPath);
     } catch (error) {
       console.error('Data operation error:', error);
       setFormMessage('Error saving data. Please try again.');
@@ -97,9 +147,8 @@ const DragDropForm = ({
       <div className={styles.optionsContainer}>
         {availableOptions.map((option) => (
           <Button
-            key={option.id}
+            key={option.category_id}
             type="button"
-            // className={styles.optionButton}
             onClick={() => handleSelect(option)}
           >
             {option.name}
@@ -110,14 +159,14 @@ const DragDropForm = ({
       <h2>Selected Options</h2>
       <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext
-          items={selectedOptions.map((opt) => opt.id)}
+          items={selectedOptions.map((opt) => opt.category_id)}
           strategy={verticalListSortingStrategy}
         >
           <div className={styles.selectedContainer}>
             {selectedOptions.map((option) => (
               <SortableItem
-                key={option.id}
-                id={option.id}
+                key={option.category_id}
+                id={option.category_id}
                 name={option.name}
                 onRemove={handleRemove}
               />
@@ -126,11 +175,7 @@ const DragDropForm = ({
         </SortableContext>
       </DndContext>
 
-      <Button
-        type="submit"
-        // className={styles.submitButton}
-        disabled={isLoading}
-      >
+      <Button type="submit" disabled={isLoading}>
         {isLoading ? 'Saving...' : 'Submit'}
       </Button>
       {formMessage && <p>{formMessage}</p>}
@@ -142,7 +187,6 @@ const SortableItem = ({ id, name, onRemove }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
 
-  // Style for drag transformation
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -151,19 +195,10 @@ const SortableItem = ({ id, name, onRemove }) => {
 
   return (
     <div ref={setNodeRef} style={style} className={styles.sortableItem}>
-      <Button
-        type="button"
-        {...attributes} // Apply drag attributes to the button
-        {...listeners} // Apply drag listeners to the button
-        // className={styles.sortableButton}
-      >
+      <Button type="button" {...attributes} {...listeners}>
         ☰ <span>{name}</span>
       </Button>
-      <Button
-        type="button"
-        onClick={() => onRemove({ id, name })}
-        // className={styles.removeButton}
-      >
+      <Button type="button" onClick={() => onRemove(id)}>
         🗑️
       </Button>
     </div>

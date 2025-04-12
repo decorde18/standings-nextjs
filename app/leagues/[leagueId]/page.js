@@ -1,5 +1,5 @@
 'use client';
-
+//VIEW LEAGUE DETAILS
 import { useState, useEffect, use } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 

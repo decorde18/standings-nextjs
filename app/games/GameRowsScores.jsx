@@ -1,11 +1,16 @@
 'use client';
-import Table from '@/components/Table';
+import { useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+
 import { useUniversalData } from '@/hooks/useUniversalData';
 import { gamesColumns } from '@/lib/tables';
-import { useQueryClient } from '@tanstack/react-query';
-import { useRouter, useSearchParams } from 'next/navigation';
+
 import Error from '../error';
+import Table from '@/components/Table';
 import Empty from '../empty';
+
+import Button from '@/components/ui/Button';
 
 function GameRowsScores({ params }) {
   const queryClient = useQueryClient();
@@ -15,6 +20,7 @@ function GameRowsScores({ params }) {
   const dlid = searchParams.get('dlid');
   const league = searchParams.get('league');
   const season = searchParams.get('season');
+  const [showScores, setShowScores] = useState(true);
 
   const {
     isLoading,
@@ -38,6 +44,7 @@ function GameRowsScores({ params }) {
     update,
     create,
     delete: deleteRecord,
+    delete: deleteGame,
   } = useUniversalData({
     table: 'scores',
   });
@@ -47,6 +54,18 @@ function GameRowsScores({ params }) {
   );
   function selectRow(rowId) {
     router.push(`/games/${rowId}`);
+  }
+  async function handleDeleteGame(rowId) {
+    const gameId = games.find((game) => game.id === rowId)?.id;
+
+    try {
+      await deleteGame({ table: 'games', id: gameId });
+
+      // Manually invalidate both queries to trigger a re-fetch
+      await queryClient.invalidateQueries({ queryKey: ['games'] });
+    } catch (err) {
+      console.error('Delete Error:', err);
+    }
   }
   async function handleDeleteScore(rowId) {
     const gameId = games.find((game) => game.id === rowId)?.id;
@@ -114,15 +133,25 @@ function GameRowsScores({ params }) {
         message="There areno games scheduled for this league/season/division "
       />
     );
-
+  const showColumns = gamesColumns.map((column) => {
+    if (column.name === 'home_score' || column.name === 'away_score') {
+      return { ...column, display: showScores };
+    } else return { ...column };
+  });
   return (
     <div className="flex-centered-columns">
       <div className="center-column">
+        <Button
+          onClick={() => setShowScores((prev) => !prev)}
+          name="showScores"
+        >
+          {showScores ? 'HIDE SCORES' : 'SHOW SCORES'}
+        </Button>
         <Table
           className="center-column"
-          columns={gamesColumns}
+          columns={showColumns}
           data={games}
-          handleDelete={handleDeleteScore}
+          handleDelete={showScores ? handleDeleteScore : handleDeleteGame}
           handleInput={handleScoreInput}
           rowsPerPage={20}
           handleRow={selectRow}

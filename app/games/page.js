@@ -2,7 +2,7 @@ import HeaderIndividualPage from '@/components/HeaderIndividualPage';
 import Spinner from '@/components/ui/Spinner';
 
 import { Suspense } from 'react';
-import GameRows from './GameRows';
+
 import AddItemButton from '@/components/ui/AddItemButton';
 import GameRowsScores from './GameRowsScores';
 
@@ -15,7 +15,6 @@ async function Games({ href, searchParams }) {
     <div>
       <HeaderIndividualPage href={href} />
       <Suspense fallback={<Spinner />}>
-        {/* <GameRows /> */}
         <GameRowsScores />
         <AddItemButton
           table="games"

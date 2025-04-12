@@ -6,7 +6,7 @@ import { standingsColumns } from '@/lib/tables';
 import { useUniversalData } from '@/hooks/useUniversalData';
 import { useSearchParams } from 'next/navigation';
 import Error from '../error';
-import rankTeams from '@/utils/rankTeams';
+import rankTeams, { possibleTotals } from '@/utils/rankTeams';
 
 function LeagueStandings() {
   const searchParams = useSearchParams();
@@ -201,21 +201,28 @@ function LeagueStandings() {
   // }
 
   // Create the newData object to handle dynamic rank and win percentage calculation
-  const newData = {
-    rank: (teamId) => {
-      const team = data.find((team) => team.team_id === teamId);
-      return team ? team.rank : null;
-    },
-    percent: (wins, gamesPlayed) =>
-      gamesPlayed ? (wins / gamesPlayed).toFixed(3) : '0.00',
-  };
-
-  // Modify data by applying new columns (rank and percent)
-  const updatedData = data.map((row) => ({
-    ...row,
-    // rank: newData.rank(row.team_id), // Assign rank dynamically
-    percent: newData.percent(row.wins, row.games_played), // Calculate win percentage
+  // const newData = {
+  //   rank: (teamId) => {
+  //     const team = data.find((team) => team.team_id === teamId);
+  //     return team ? team.rank : null;
+  //   },
+  //   percent: (wins, ties, gamesPlayed) =>
+  //     gamesPlayed ? ((wins + 0.5 * ties) / gamesPlayed).toFixed(3) : '0.00',
+  // };
+  // // Modify data by applying new columns (rank and percent)
+  // const updatedData = data.map((row) => ({
+  //   ...row,
+  //   // rank: newData.rank(row.team_id), // Assign rank dynamically
+  //   percent: newData.percent(row.wins, 0.5 * row.ties, row.games_played), // Calculate win percentage
+  // }));
+  const updatedTeams = rankedTeams.map((team) => ({
+    ...team,
+    percent: team.games_played
+      ? ((+team.wins + 0.5 * +team.ties) / team.games_played).toFixed(3)
+      : '0.000',
   }));
+  const updatedPossibleTotals = rankedTeams.map((team) => possibleTotals(team));
+  console.log(updatedPossibleTotals, config);
   if (!dlid)
     return (
       <Error
@@ -232,7 +239,7 @@ function LeagueStandings() {
   //   />
   // );
   // return <Table columns={columns} data={rankTeams(data, sortedTiebreakers)} />;
-  return <Table columns={columns} data={rankedTeams} />;
+  return <Table columns={columns} data={updatedTeams} />;
 }
 
 export default LeagueStandings;

@@ -1,4 +1,5 @@
 'use client';
+// PAGE TO EDIT GAME DETAILS
 import { useEffect, useState } from 'react';
 
 import { useFilter } from '@/providers/FilterProvider';

@@ -23,7 +23,7 @@ export default function rankTeams(teams, config) {
     head_to_head: 0,
     tiebreakerBrokenOn: [],
   }));
-  console.log(teams);
+
   // --- STEP 1: SORT TEAMS BY POINTS AND ASSIGN BASE RANKS
   const sortedTeams =
     tiebreakerStyle === 'dynamic'
@@ -153,4 +153,8 @@ export default function rankTeams(teams, config) {
   }
 
   return getFinalRanks(sortedTeams);
+}
+
+export function possibleTotals(team) {
+  return team;
 }
